@@ -1,0 +1,2664 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Fantasy Finance League<br><span class="tagline">Play the market. Beat your friends.</span> — Playbook (V4)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#070A12;
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.08);
+      --stroke:rgba(255,255,255,.10);
+      --text:#E9EDF7;
+      --muted:rgba(233,237,247,.70);
+      --muted2:rgba(233,237,247,.55);
+      --good:#35D07F;
+      --bad:#FF5A7A;
+      --warn:#FFC857;
+      --brand:#7C5CFF;
+      --brand2:#25C2FF;
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+      --radius:18px;
+      --radius2:14px;
+      --pad:18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        radial-gradient(900px 600px at 18% 12%, rgba(124,92,255,.22), transparent 60%),
+        radial-gradient(900px 600px at 85% 18%, rgba(37,194,255,.16), transparent 58%),
+        radial-gradient(1200px 900px at 65% 110%, rgba(53,208,127,.12), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      font-family:var(--sans);
+      min-height:100vh;
+    }
+    .wrap{max-width:1120px; margin:0 auto; padding:22px 16px 46px}
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px;}
+    .brand{display:flex; align-items:center; gap:12px}
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background: linear-gradient(135deg, rgba(124,92,255,1), rgba(37,194,255,1));
+      box-shadow: 0 10px 30px rgba(124,92,255,.20);
+      position:relative; overflow:hidden;
+    }
+    .logo:after{
+      content:""; position:absolute; inset:-40%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.38), transparent 60%);
+      transform: rotate(25deg);
+    }
+    .brand h1{font-size:16px; margin:0; letter-spacing:.2px}
+    .brand p{margin:0; color:var(--muted); font-size:12px}
+
+    .tabs{
+      display:flex; gap:6px;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--stroke);
+      padding:4px; border-radius:999px;
+      backdrop-filter: blur(10px);
+      overflow-x:auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar{display:none}
+    .tab{
+      padding:8px 10px; border-radius:999px;
+      color:var(--muted); font-size:11px; letter-spacing:.2px;
+      border:1px solid transparent;
+      cursor:pointer; user-select:none;
+      white-space:nowrap;
+    }
+    .tab.active{
+      background: linear-gradient(135deg, rgba(124,92,255,.35), rgba(37,194,255,.25));
+      border-color: rgba(255,255,255,.16);
+      color: var(--text);
+    }
+
+    .top-actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
+    .pill{
+      padding:10px 12px; border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      color:var(--muted);
+      font-size:12px;
+      display:flex; align-items:center; gap:8px;
+      backdrop-filter: blur(10px);
+    }
+    .btn{
+      padding:10px 12px; border-radius:12px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor:pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,.20);
+    }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(124,92,255,.48), rgba(37,194,255,.32));
+      border-color: rgba(255,255,255,.20);
+    }
+    .btn:active{transform: translateY(1px)}
+    .small{font-size:11px; color:var(--muted2)}
+    .mono{font-family:var(--mono)}
+    .muted{color:var(--muted)}
+    .right{text-align:right}
+    .good{color:var(--good)}
+    .bad{color:var(--bad)}
+    .warn{color:var(--warn)}
+
+    .grid{display:grid; grid-template-columns: 1.25fr .75fr; gap:14px; align-items:start;}
+    @media (max-width: 980px){ .grid{grid-template-columns: 1fr} }
+
+    .card{
+      background: var(--panel);
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      padding: var(--pad);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+    .card h2{
+      margin:0 0 10px; font-size:13px; letter-spacing:.25px;
+      color: var(--muted);
+      font-weight:600;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+
+    .kpis{display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-bottom:14px;}
+    @media (max-width: 980px){ .kpis{grid-template-columns: repeat(2, 1fr)} }
+    .kpi{
+      background: var(--panel2);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius2);
+      padding:12px 12px;
+      min-height:72px;
+    }
+    .kpi .label{font-size:11px; color:var(--muted2); margin-bottom:6px}
+    .kpi .value{font-size:18px; font-weight:700; letter-spacing:.2px}
+    .kpi .delta{margin-top:6px; font-size:11px; font-family:var(--mono); color:var(--muted)}
+
+    .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin: 6px 0 10px;}
+    .toolbar .left, .toolbar .right{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .input{
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.14);
+      color: var(--text);
+      padding:10px 10px;
+      border-radius: 12px;
+      outline:none;
+      min-width: 150px;
+    }
+    .input::placeholder{color:rgba(233,237,247,.45)}
+    .select{
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.14);
+      color: var(--text);
+      padding:10px 10px;
+      border-radius: 12px;
+      outline:none;
+    }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+    }
+    thead th{
+      position:sticky; top:0;
+      background: rgba(9,11,18,.85);
+      backdrop-filter: blur(10px);
+      font-size:11px;
+      letter-spacing:.25px;
+      color:rgba(233,237,247,.70);
+      text-align:left;
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      z-index:2;
+    }
+    tbody td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      font-size:12px;
+      color:rgba(233,237,247,.92);
+      vertical-align:middle;
+    }
+    tbody tr:hover td{background: rgba(255,255,255,.03)}
+    tbody tr.clickable:hover td{background: rgba(124,92,255,.10)}
+    .actions{display:flex; gap:8px; justify-content:flex-end}
+    .iconbtn{
+      width:34px; height:34px; border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      cursor:pointer;
+      display:inline-flex; align-items:center; justify-content:center;
+    }
+    .iconbtn:hover{background: rgba(255,255,255,.08)}
+
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      font-size:11px;
+      color: rgba(233,237,247,.88);
+      white-space:nowrap;
+    }
+
+    .tickerchip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      font-family: var(--mono);
+      font-size:12px;
+      cursor:pointer;
+      transition: background .15s ease, transform .05s ease;
+    }
+
+    .faRow{
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      padding:10px 10px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+    }
+    .faLeft{display:flex; align-items:center; gap:10px; min-width: 0;}
+    .faTicker{font-family: var(--mono); font-weight:900; letter-spacing:.2px;}
+    .faMeta{font-size:11px; color: rgba(233,237,247,.55); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 260px;}
+    .faBtns{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+    .tickerchip:hover{ background: rgba(255,255,255,.08); }
+    .tickerchip:active{ transform: translateY(1px); }
+    .tickerchip .spark{ width:7px; height:7px; border-radius:99px; background: rgba(37,194,255,.9); }
+    .dot{width:7px; height:7px; border-radius:99px; background: var(--brand2)}
+    .pos-QB .dot{background: #7C5CFF}
+    .pos-OL .dot{background: #35D07F}
+    .pos-WR .dot{background: #25C2FF}
+    .pos-RB .dot{background: #FFC857}
+    .pos-TE .dot{background: #A7FF83}
+    .pos-K .dot{background: #FF5A7A}
+
+    /* mobile cards */
+    @media (max-width: 820px){
+      table, thead {display:none;}
+      .cards{display:grid; gap:10px;}
+      .rowcard{border:1px solid rgba(255,255,255,.12); border-radius: 16px; background: rgba(0,0,0,.12); padding: 12px;}
+      .rowtop{display:flex; justify-content:space-between; gap:10px; align-items:center}
+      .rowmain{margin-top:10px; display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+      .kv{padding:10px; border-radius:14px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10)}
+      .kv .k{font-size:10px; color:rgba(233,237,247,.55)}
+      .kv .v{margin-top:6px; font-family: var(--mono); font-size:12px}
+    }
+
+    .mini{display:grid; gap:12px;}
+    .mini .card{padding: 14px}
+    .split{display:grid; grid-template-columns: 1fr 1fr; gap:10px;}
+    @media (max-width: 980px){ .split{grid-template-columns: 1fr} }
+
+    /* matchup */
+    .match-grid{display:grid; grid-template-columns: 1fr 1fr; gap: 14px;}
+    @media (max-width: 980px){ .match-grid{grid-template-columns: 1fr} }
+    .bigscore{
+      display:flex; justify-content:space-between; gap:12px; align-items:center;
+      padding: 14px; border-radius: 16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+    }
+    .teamname{font-weight:800; letter-spacing:.2px}
+    .score{font-family:var(--mono); font-size: 22px; font-weight:900;}
+    .subrow{margin-top:10px; display:flex; justify-content:space-between; color:rgba(233,237,247,.60); font-size:12px}
+    .subrow span{font-family:var(--mono)}
+    .note{color:rgba(233,237,247,.65); font-size:12px; line-height:1.45;}
+
+    /* standings + team */
+    .standings-head{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-bottom:10px;}
+    .standings-actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.14);
+      padding:8px 10px; border-radius: 999px;
+      color: rgba(233,237,247,.75);
+      font-size:12px;
+    }
+    .rank{font-family: var(--mono); font-weight:800; width:42px; text-align:center; color: rgba(233,237,247,.80);}
+    .teamcell{display:flex; gap:10px; align-items:center; min-width: 220px;}
+    .avatar{
+      width:26px; height:26px; border-radius:10px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      display:inline-flex; align-items:center; justify-content:center;
+      font-size:11px; color: rgba(233,237,247,.80);
+    }
+    .highlight-row td{background: rgba(124,92,255,.10) !important;}
+
+    .team-hero{
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:flex-end;
+      margin-bottom:12px;
+    }
+    .team-title{
+      display:flex; gap:12px; align-items:center;
+    }
+    .team-big{
+      font-size:18px; font-weight:900; letter-spacing:.2px; margin:0;
+    }
+    .team-meta{margin:4px 0 0; color:rgba(233,237,247,.62); font-size:12px}
+    .miniStatRow{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center}
+    .miniStat{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.14);
+      border-radius: 14px;
+      padding:10px 12px;
+      min-width: 140px;
+    }
+    .miniStat .k{font-size:11px; color:rgba(233,237,247,.60)}
+    .miniStat .v{margin-top:6px; font-family:var(--mono); font-size:14px; font-weight:900}
+
+
+
+    .awardItem{
+      display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
+      padding:10px 10px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+      margin: 8px 0;
+    }
+    .awardItem .title{font-weight:900; letter-spacing:.2px;}
+    .awardItem .desc{margin-top:4px; font-size:12px; color:rgba(233,237,247,.70); line-height:1.35;}
+    .awardItem .val{font-family: var(--mono); font-weight:900; white-space:nowrap;}
+
+
+
+    /* draft */
+    .boardGrid{
+      display:grid;
+      grid-template-columns: 60px repeat(var(--teams), minmax(150px, 1fr));
+      gap:8px;
+      padding:10px;
+    }
+    .boardHdr{
+      position:sticky; top:0;
+      background: rgba(8,10,16,.92);
+      backdrop-filter: blur(10px);
+      z-index: 2;
+      padding-top:10px;
+    }
+    .cell{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+      border-radius: 14px;
+      padding:10px;
+      min-height: 54px;
+    }
+    .cell.r{
+      display:flex; align-items:center; justify-content:center;
+      font-family: var(--mono);
+      color: rgba(233,237,247,.60);
+      font-size: 12px;
+    }
+    .pickCell{
+      display:flex; flex-direction:column; gap:4px;
+    }
+    .pickTop{
+      display:flex; justify-content:space-between; gap:10px; align-items:center;
+    }
+    .pickNo{font-family: var(--mono); font-size:11px; color: rgba(233,237,247,.50);}
+    .pickT{font-family: var(--mono); font-weight:900;}
+    .pickTeam{font-size:11px; color: rgba(233,237,247,.55); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+    .onClock{
+      outline: 2px solid rgba(37,194,255,.55);
+      box-shadow: 0 0 0 6px rgba(37,194,255,.10);
+    }
+    .draftLogItem{
+      padding:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+      border-radius: 14px;
+      margin: 8px 0;
+      display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
+    }
+    .draftLogItem .left{min-width:0}
+    .draftLogItem .right{font-family: var(--mono); font-weight:900; white-space:nowrap;}
+
+
+    /* chat */
+    .chatWrap{display:grid; grid-template-columns: 1fr 320px; gap:14px; align-items:start;}
+    @media (max-width: 980px){ .chatWrap{grid-template-columns: 1fr} }
+    .chatList{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+      border-radius: 16px;
+      padding: 12px;
+      max-height: 520px;
+      overflow:auto;
+    }
+    .msg{display:flex; gap:10px; margin: 10px 0; align-items:flex-start;}
+    .msg .bubble{
+      flex:1;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: 16px;
+      padding: 10px 12px;
+    }
+    .msg .meta{display:flex; justify-content:space-between; gap:10px; margin-bottom:6px;}
+    .msg .name{font-weight:900; letter-spacing:.2px; font-size:12px;}
+    .msg .time{font-size:11px; color:rgba(233,237,247,.55); font-family: var(--mono);}
+    .msg .text{font-size:12px; color:rgba(233,237,247,.88); line-height:1.4; white-space:pre-wrap;}
+    .msg.me .bubble{
+      background: linear-gradient(135deg, rgba(124,92,255,.22), rgba(37,194,255,.14));
+      border-color: rgba(255,255,255,.16);
+    }
+    .chatComposer{
+      margin-top: 10px;
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .chatComposer .input{flex:1; min-width: 220px;}
+    .quickRow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+    .qbtn{
+      padding:8px 10px; border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      color: rgba(233,237,247,.85);
+      font-size:11px;
+      cursor:pointer;
+    }
+    .qbtn:hover{background: rgba(255,255,255,.07)}
+    .chatSide .card{box-shadow:none}
+
+    /* modal + toast */
+    .backdrop{position:fixed; inset:0; background: rgba(0,0,0,.62); display:none; align-items:center; justify-content:center; padding: 18px; z-index: 999;}
+    .modal{
+      width: min(720px, 100%);
+      background: rgba(10,12,20,.92);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 18px;
+      box-shadow: 0 30px 100px rgba(0,0,0,.55);
+      backdrop-filter: blur(14px);
+      padding: 16px;
+    }
+    .modal h3{margin:0; font-size:14px; color:rgba(233,237,247,.92)}
+    .modal p{margin:6px 0 0; color:rgba(233,237,247,.65); font-size:12px}
+    .modal .grid2{margin-top:14px; display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
+    @media (max-width: 720px){ .modal .grid2{grid-template-columns: 1fr} }
+    .field label{display:block; font-size:11px; color:rgba(233,237,247,.65); margin-bottom:6px}
+    .field input, .field select{width:100%;}
+    .modal .footer{margin-top:14px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;}
+    .hint{font-size:11px; color:rgba(233,237,247,.55)}
+    .toast{
+      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+      background: rgba(10,12,20,.92);
+      border:1px solid rgba(255,255,255,.14);
+      padding:10px 12px;
+      border-radius: 14px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      color: rgba(233,237,247,.90);
+      font-size:12px;
+      display:none;
+      z-index: 1000;
+    }
+  
+.tagline{
+  display:inline-block;
+  font-size:14px;
+  font-weight:500;
+  opacity:0.85;
+  margin-top:4px;
+}
+
+    /* header refinements */
+    .brand > div{min-width:0}
+    .titleRow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:nowrap;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      margin:0;
+      font-size:16px;
+      letter-spacing:.2px;
+    }
+    .titleText{
+      display:inline-block;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .trophy{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:26px;
+      height:26px;
+      border-radius:10px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      font-size:14px;
+      flex: 0 0 auto;
+    }
+    .taglineRow{
+      margin:2px 0 0;
+      color:rgba(233,237,247,.70);
+      font-size:12px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    @media (max-width: 520px){
+      .titleRow{font-size:14px;}
+      .taglineRow{font-size:11px;}
+      .trophy{width:24px; height:24px; font-size:13px;}
+    }
+
+
+    .statusRow{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-top:8px;
+      flex-wrap:wrap;
+    }
+    .statusChip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      color: rgba(233,237,247,.78);
+      font-size:11px;
+      font-family: var(--mono);
+      white-space:nowrap;
+    }
+    .statusDot{
+      width:8px; height:8px; border-radius:99px;
+      background: rgba(233,237,247,.35);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.04);
+      flex:0 0 auto;
+    }
+    .statusDot.open{ background: rgba(53,208,127,.95); box-shadow: 0 0 0 4px rgba(53,208,127,.12); }
+    .statusDot.closed{ background: rgba(255,90,122,.95); box-shadow: 0 0 0 4px rgba(255,90,122,.12); }
+
+</style>
+
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <h1 class="titleRow"><span class="titleText">Fantasy Finance League</span><span class="trophy" aria-hidden="true">🏆</span></h1>
+          <p class="taglineRow">Play the market. Beat your friends.</p>
+          <div class="statusRow" aria-label="League status">
+            <span class="statusChip" id="statusWeek">Week —</span>
+            <span class="statusDot" id="statusDot" aria-hidden="true"></span>
+            <span class="statusChip" id="statusMarket">Market —</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Pages">
+        <div class="tab active" data-page="playbook">📊 Playbook</div>
+        <div class="tab" data-page="matchup">🏈 Matchup</div>
+        <div class="tab" data-page="draft">📝 Draft</div>
+        <div class="tab" data-page="standings">🏆 Standings</div>
+        <div class="tab" data-page="awards">🥇 Awards</div>
+        <div class="tab" data-page="team">👥 Teams</div>
+        <div class="tab" data-page="chat">💬 Chat</div>
+        <div class="tab" data-page="concept">Investor One‑Pager</div>
+      </div>
+
+      <div class="top-actions">
+        <div class="pill"><span class="small">League:</span> <b id="leagueName">Founders League</b></div>
+        <button class="btn" id="btnShare">Share lineup</button>
+        <button class="btn primary" id="btnAdd">Add ticker</button>
+      </div>
+    </div>
+
+    <!-- PLAYBOOK -->
+    <section id="page-playbook">
+      <div class="grid">
+        <div class="card">
+          <h2><span>My Playbook</span><span class="small">Live prices via Finnhub (demo)</span></h2>
+
+          <div class="kpis">
+            <div class="kpi">
+              <div class="label">Portfolio Value</div>
+              <div class="value" id="kpiValue">$—</div>
+              <div class="delta mono" id="kpiValueSub">Target: $10,000</div>
+            </div>
+            <div class="kpi">
+              <div class="label">Today (weighted)</div>
+              <div class="value" id="kpiToday">—%</div>
+              <div class="delta mono" id="kpiTodaySub">Last refresh: —</div>
+            </div>
+            <div class="kpi">
+              <div class="label">QB Concentration</div>
+              <div class="value" id="kpiQB">—%</div>
+              <div class="delta mono">Cap suggestion: 25–40%</div>
+            </div>
+            <div class="kpi">
+              <div class="label">Positions Filled</div>
+              <div class="value" id="kpiFilled">—/—</div>
+              <div class="delta mono" id="kpiFilledSub">League-ready: —</div>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <div class="left">
+              <input class="input" id="search" placeholder="Search ticker or position…"/>
+              <select class="select" id="filterPos">
+                <option value="">All positions</option>
+                <option value="QB">QB</option>
+                <option value="OL">OL</option>
+                <option value="WR">WR</option>
+                <option value="RB">RB</option>
+                <option value="TE">TE</option>
+                <option value="K">K</option>
+              </select>
+              <select class="select" id="sortBy">
+                <option value="pos">Sort: Position</option>
+                <option value="allocDesc">Sort: Allocation (desc)</option>
+                <option value="todayDesc">Sort: Today (desc)</option>
+              </select>
+            </div>
+            <div class="right">
+              <button class="btn" id="btnNormalize">Normalize allocations</button>
+              <button class="btn" id="btnSave">Save</button>
+            </div>
+          </div>
+
+          <div class="small muted" style="margin:0 0 10px;">
+            Tip: click a row to edit. “Share lineup” creates a link you can send to friends.
+          </div>
+
+          <table aria-label="Roster table">
+            <thead>
+              <tr>
+                <th>Position</th>
+                <th>Ticker</th>
+                <th class="right">Allocation</th>
+                <th class="right">Price</th>
+                <th class="right">Today</th>
+                <th class="right">Pts (wk)</th>
+                <th class="right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+
+          <div class="cards" id="cards" style="display:none; margin-top:10px;"></div>
+        </div>
+
+        <div class="mini">
+          <div class="card">
+            <h2><span>Allocation</span><span class="small">by position</span></h2>
+            <div style="height:240px"><canvas id="chartAlloc"></canvas></div>
+            <div class="small muted" style="margin-top:10px">Demo visualization. In league mode, caps can enforce balance.</div>
+          </div>
+
+          <div class="split">
+            <div class="card">
+              <h2><span>Quick Rules</span><span class="small">MVP</span></h2>
+              <div class="note">
+                <div>• QB = core long-term holding</div>
+                <div>• OL = defensive “portfolio protectors”</div>
+                <div>• WR/RB/TE = growth & thematic plays</div>
+                <div>• K = speculative / high-volatility slot</div>
+              </div>
+            </div>
+            <div class="card">
+              <h2><span>League Actions</span><span class="small">mock</span></h2>
+              <div class="note">
+                <div>• Weekly H2H matchups (W/L)</div>
+                <div>• Points = weekly % return × 100</div>
+                <div>• Trades lock Fri 4pm ET</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2><span>Free Agents</span><span class="small">watchlist</span></h2>
+            <div class="note" style="margin-bottom:10px;">
+              Add tickers to your watchlist, then quickly add/drop them into your roster.
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
+              <input class="input" id="faInput" placeholder="Add free agent (e.g., PLTR)"/>
+              <button class="btn" id="btnFaAdd">Add</button>
+              <span class="small muted">Tip: “Add to roster” uses default <span class="mono">WR</span> + <span class="mono">5%</span>.</span>
+            </div>
+
+            <div id="faList" style="display:grid; gap:8px;"></div>
+          </div>
+
+          <div class="card">
+            <h2><span>API Note</span><span class="small warn">important</span></h2>
+            <div class="note">This prototype pulls prices client‑side. For real launch, move keys server‑side to avoid exposing secrets.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MATCHUP -->
+    <section id="page-matchup" style="display:none;">
+      <div class="card" style="margin-bottom:14px;">
+        <h2><span>Week 1 Matchup</span><span class="small">mock scoreboard</span></h2>
+        <div class="match-grid">
+          <div>
+            <div class="bigscore">
+              <div>
+                <div class="teamname">You (Playbook)</div>
+                <div class="small muted">Record: <span class="mono" id="recYou">0‑0</span></div>
+              </div>
+              <div class="score" id="scoreYou">—</div>
+            </div>
+            <div class="subrow"><div>Weekly return</div><span id="wkYou">—%</span></div>
+            <div class="subrow"><div>QB anchor</div><span id="qbYou">—</span></div>
+            <div style="margin-top:10px">
+              <button class="btn" id="btnGoYourTeam">View Team Page</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="bigscore">
+              <div>
+                <div class="teamname">Opponent (Demo)</div>
+                <div class="small muted">Record: <span class="mono" id="recOpp">0‑0</span></div>
+              </div>
+              <div class="score" id="scoreOpp">—</div>
+            </div>
+            <div class="subrow"><div>Weekly return</div><span id="wkOpp">—%</span></div>
+            <div class="subrow"><div>QB anchor</div><span id="qbOpp">AAPL</span></div>
+            <div style="margin-top:10px">
+              <button class="btn" id="btnGoOppTeam">View Team Page</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h2><span>Points Breakdown</span><span class="small">your lineup (weighted)</span></h2>
+          <div style="height:280px"><canvas id="chartWeek"></canvas></div>
+          <div class="small muted" style="margin-top:10px">
+            For the MVP: <span class="mono">points = (weekly % return) × 100</span>. This is illustrative.
+          </div>
+        </div>
+
+        <div class="mini">
+          <div class="card">
+            <h2><span>Shareable League Link</span><span class="small">demo</span></h2>
+            <div class="note" style="margin-bottom:10px">Use “Share lineup” to generate a URL with your lineup encoded.</div>
+            <input class="input" id="shareUrl" readonly value="Click Share lineup…"/>
+            <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+              <button class="btn" id="btnCopy">Copy link</button>
+              <button class="btn" id="btnLoadFromUrl">Load from link</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2><span>League MVP Roadmap</span><span class="small">A + B</span></h2>
+            <div class="note">
+              <div><b>Play (A):</b> personal roster tracking + coaching metaphor</div>
+              <div style="margin-top:8px"><b>Compete (B):</b> weekly matchups + standings + draft</div>
+              <div class="small muted" style="margin-top:10px">Next: Draft Room • Trades • Waivers</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- DRAFT -->
+    <section id="page-draft" style="display:none;">
+      <div class="card">
+        <div class="standings-head" style="margin-bottom:12px;">
+          <div>
+            <h2 style="margin:0 0 6px;"><span>Draft Room</span><span class="small">snake draft • demo</span></h2>
+            <div class="small muted">Draft stocks like fantasy players. Picks save locally (prototype).</div>
+          </div>
+          <div class="standings-actions">
+            <span class="chip">Teams: <span class="mono" id="draftTeamsCount">—</span></span>
+            <span class="chip">Rounds: <span class="mono" id="draftRoundsChip">—</span></span>
+            <span class="chip">On the clock: <span class="mono" id="draftOnClock">—</span></span>
+          </div>
+        </div>
+
+        <div class="split" style="margin-bottom:12px;">
+          <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03);">
+            <h2 style="margin-bottom:8px"><span>Draft Controls</span><span class="small">commissioner</span></h2>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+              <label class="small muted">Rounds</label>
+              <input class="input" id="draftRounds" style="width:120px;" type="number" min="1" max="30" value="8"/>
+              <label class="small muted">Clock (sec)</label>
+              <input class="input" id="draftClock" style="width:140px;" type="number" min="5" max="300" value="45"/>
+              <button class="btn primary" id="btnDraftStart">Start / Resume</button>
+              <button class="btn" id="btnDraftPause">Pause</button>
+              <button class="btn" id="btnDraftReset">Reset</button>
+            </div>
+            <div class="note" style="margin-top:12px;">
+              • Snake draft order reverses every round.<br/>
+              • Auto-pick triggers when the clock hits zero (demo).<br/>
+              • You can click any available ticker to draft for the team on the clock.
+            </div>
+          </div>
+
+          <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03);">
+            <h2 style="margin-bottom:8px"><span>Available Stocks</span><span class="small">free agents pool</span></h2>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
+              <input class="input" id="draftSearch" placeholder="Search tickers… (e.g., NVDA)"/>
+              <button class="btn" id="btnDraftAuto">Auto-pick</button>
+              <button class="btn" id="btnDraftImport">Import my drafted tickers → Playbook</button>
+            </div>
+            <div id="draftPool" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03);">
+            <h2 style="margin-bottom:8px"><span>Draft Board</span><span class="small">rounds</span></h2>
+            <div class="note small muted" style="margin-bottom:10px;">Tip: scroll the board horizontally on smaller screens.</div>
+            <div id="draftBoardWrap" style="overflow:auto; border:1px solid rgba(255,255,255,.10); border-radius:16px;">
+              <div id="draftBoard" style="min-width:860px;"></div>
+            </div>
+          </div>
+
+          <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03);">
+            <h2 style="margin-bottom:8px"><span>Pick Log</span><span class="small">latest</span></h2>
+            <div id="draftLog" style="max-height:520px; overflow:auto;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- STANDINGS -->
+    <section id="page-standings" style="display:none;">
+      <div class="card">
+        <div class="standings-head">
+          <div>
+            <h2 style="margin:0 0 6px;"><span>🏆 Standings</span><span class="small" id="standingsSub">Week 1 • Demo</span></h2>
+            <div class="small muted">Click any team to open their Team Page (roster + weekly scores).</div>
+          </div>
+          <div class="standings-actions">
+            <span class="chip">Scoring: <span class="mono">weekly % × 100</span></span>
+            <button class="btn" id="btnSimWeek">Simulate Week</button>
+            <button class="btn" id="btnResetLeague">Reset</button>
+          </div>
+        </div>
+
+        <table aria-label="Standings table">
+          <thead>
+            <tr>
+              <th class="rank">RK</th>
+              <th>Team</th>
+              <th class="right">W‑L</th>
+              <th class="right">PF</th>
+              <th class="right">PA</th>
+              <th class="right">Streak</th>
+              <th class="right">Last</th>
+            </tr>
+          </thead>
+          <tbody id="standingsBody"></tbody>
+        </table>
+
+        <div class="small muted" style="margin-top:10px">
+          Note: simulation is for presentation. In the real product, week results come from close‑to‑close returns.
+        </div>
+      </div>
+    </section>
+
+
+    <!-- AWARDS -->
+    <section id="page-awards" style="display:none;">
+      <div class="card">
+        <div class="standings-head" style="margin-bottom:12px;">
+          <div>
+            <h2 style="margin:0 0 6px;"><span>Weekly Awards</span><span class="small" id="awardsSub">Week 1 • Demo</span></h2>
+            <div class="small muted">Fun + addictive. These auto-update when you “Simulate Week”.</div>
+          </div>
+          <div class="standings-actions">
+            <span class="chip">Format: <span class="mono">ESPN‑style</span></span>
+            <button class="btn" id="btnAwardsRefresh">Refresh</button>
+          </div>
+        </div>
+
+        <div class="split" style="margin-bottom:12px;">
+          <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03);">
+            <h2 style="margin-bottom:8px"><span>League Awards</span><span class="small">this week</span></h2>
+            <div id="leagueAwards" class="note"></div>
+          </div>
+          <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03);">
+            <h2 style="margin-bottom:8px"><span>Your Lineup Awards</span><span class="small">playbook</span></h2>
+            <div id="yourAwards" class="note"></div>
+          </div>
+        </div>
+
+        <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03);">
+          <h2 style="margin-bottom:8px"><span>Receipt</span><span class="small">shareable</span></h2>
+          <div class="note" id="awardsReceipt"></div>
+          <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:12px;">
+            <div class="small muted">Tip: screenshot this page for group chats.</div>
+            <button class="btn primary" id="btnCopyReceipt">Copy receipt</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- TEAM PAGE -->
+    <section id="page-team" style="display:none;">
+      <div class="card">
+        <div class="team-hero">
+          <div class="team-title">
+            <span class="avatar" id="teamAvatar">—</span>
+            <div>
+              <p class="team-big" id="teamName">Team</p>
+              <p class="team-meta">Roster + weekly scores • Click teams from Standings</p>
+            </div>
+          </div>
+          <div class="miniStatRow">
+            <div class="miniStat">
+              <div class="k">Record</div>
+              <div class="v" id="teamRecord">0‑0</div>
+            </div>
+            <div class="miniStat">
+              <div class="k">Points For</div>
+              <div class="v" id="teamPF">0</div>
+            </div>
+            <div class="miniStat">
+              <div class="k">QB</div>
+              <div class="v" id="teamQB">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbar" style="margin-top:0;">
+          <div class="left">
+            <select class="select" id="teamSelect"></select>
+            <span class="chip">Team pages are <span class="mono">league‑view</span> — everyone’s roster + scores.</span>
+          </div>
+          <div class="right">
+            <button class="btn" id="btnBackToStandings">Back to Standings</button>
+          </div>
+        </div>
+
+        <div class="grid" style="margin-top:12px;">
+          <div class="card" style="box-shadow:none;">
+            <h2><span>Roster</span><span class="small">positions + allocations</span></h2>
+            <table aria-label="Team roster">
+              <thead>
+                <tr>
+                  <th>Position</th>
+                  <th>Ticker</th>
+                  <th class="right">Allocation</th>
+                  <th class="right">Notes</th>
+                </tr>
+              </thead>
+              <tbody id="teamRosterBody"></tbody>
+            </table>
+          </div>
+
+          <div class="mini">
+            <div class="card" style="box-shadow:none;">
+              <h2><span>Weekly Scores</span><span class="small">by week</span></h2>
+              <div style="height:210px; margin-top:6px; margin-bottom:10px;"><canvas id="teamChart"></canvas></div>
+              <table aria-label="Weekly scores">
+                <thead>
+                  <tr>
+                    <th>Week</th>
+                    <th>Opponent</th>
+                    <th class="right">Pts</th>
+                    <th class="right">Result</th>
+                  </tr>
+                </thead>
+                <tbody id="teamWeeksBody"></tbody>
+              </table>
+              <div class="small muted" style="margin-top:10px">
+                MVP: scores come from league schedule results. Simulate Week to populate.
+              </div>
+            </div>
+
+            <div class="card" style="box-shadow:none;">
+              <h2><span>Pitch Moment</span><span class="small">why this matters</span></h2>
+              <div class="note">
+                Team pages unlock the “sports feeling”: you don’t just see numbers — you see rosters, weekly results, and rivalries.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- CHAT -->
+    <section id="page-chat" style="display:none;">
+      <div class="card">
+        <h2><span>League Chat</span><span class="small">trash talk + updates</span></h2>
+        <div class="chatWrap">
+          <div>
+            <div class="toolbar" style="margin-top:0;">
+              <div class="left">
+                <span class="chip">Channel: <span class="mono">#founders-league</span></span>
+                <span class="chip">Week <span class="mono" id="chatWeek">1</span></span>
+              </div>
+              <div class="right">
+                <button class="btn" id="btnChatClear">Clear</button>
+              </div>
+            </div>
+
+            <div class="chatList" id="chatList" aria-label="Chat messages"></div>
+
+            <div class="chatComposer" aria-label="Compose message">
+              <select class="select" id="chatSender"></select>
+              <input class="input" id="chatInput" placeholder="Message… (Enter to send)"/>
+              <button class="btn primary" id="btnChatSend">Send</button>
+            </div>
+
+            <div class="quickRow" aria-label="Quick messages">
+              <button class="qbtn" data-q="TSLA is cooked 🔥">TSLA is cooked 🔥</button>
+              <button class="qbtn" data-q="Waiver wire is looking JUICY 👀">Waiver wire is looking JUICY 👀</button>
+              <button class="qbtn" data-q="GG. Rematch next week.">GG. Rematch next week.</button>
+              <button class="qbtn" data-q="My QB is carrying 😤">My QB is carrying 😤</button>
+            </div>
+          </div>
+
+          <div class="chatSide">
+            <div class="card" style="background:rgba(255,255,255,.03);">
+              <h2 style="margin-bottom:8px;"><span>How to use</span><span class="small">MVP</span></h2>
+              <div class="note">
+                • Talk trash, call picks, share wins.<br/>
+                • “Simulate Week” then post receipts.<br/>
+                • In the real app: threads, reactions, notifications.
+              </div>
+            </div>
+
+            <div class="card" style="background:rgba(255,255,255,.03);">
+              <h2 style="margin-bottom:8px;"><span>League Pulse</span><span class="small">demo</span></h2>
+              <div class="note">
+                <div>Top PF: <span class="mono" id="pulseTopPF">—</span></div>
+                <div style="margin-top:6px;">Hottest team: <span class="mono" id="pulseHot">—</span></div>
+                <div style="margin-top:6px;">Most recent: <span class="mono" id="pulseLast">—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- CONCEPT -->
+    <section id="page-concept" style="display:none;">
+      <div class="card">
+        <h2><span>Fantasy Finance League</span><span class="small">Investor-ready concept (one page)</span></h2>
+        <div class="note" style="max-width: 900px">
+          <div style="font-size:14px; font-weight:800; color:rgba(233,237,247,.92); margin-bottom:6px;">
+            “Fantasy Football for Investing — draft a lineup, compete weekly, build real habits.”
+          </div>
+          <div class="small muted" style="margin-bottom:14px">
+            Vision (A+B): a fun gamified portfolio tracker that becomes a competitive head‑to‑head league product.
+          </div>
+
+          <div class="split">
+            <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03);">
+              <h2 style="margin-bottom:8px"><span>Problem</span><span></span></h2>
+              <div class="note">Investing is confusing, lonely, and not sticky. Portfolio trackers don’t build habits through competition.</div>
+            </div>
+            <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03);">
+              <h2 style="margin-bottom:8px"><span>Solution</span><span></span></h2>
+              <div class="note">Draft positions (QB/OL/WR/etc.), track weekly performance, and win matchups — while learning portfolio construction.</div>
+            </div>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="split">
+            <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03);">
+              <h2 style="margin-bottom:8px"><span>MVP Features</span><span></span></h2>
+              <div class="note">
+                • Lineup builder (allocations + caps)<br/>
+                • Weekly matchups + standings<br/>
+                • Team pages (rosters + scores)<br/>
+                • Share links + league invites<br/>
+                • Education nudges (coach tips)
+              </div>
+            </div>
+            <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03);">
+              <h2 style="margin-bottom:8px"><span>Business Model</span><span></span></h2>
+              <div class="note">
+                • Subscription leagues ($5–$10/mo)<br/>
+                • Sponsored leagues (brands/creators)<br/>
+                • Premium analytics add-ons<br/>
+                • Future: brokerage integrations & revenue share
+              </div>
+            </div>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03);">
+            <h2 style="margin-bottom:8px"><span>Why We Win</span><span></span></h2>
+            <div class="note">The moat is the metaphor + league format. People don’t just “track” — they compete weekly, share, and return.</div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:14px;">
+            <div class="small muted">Tip: print this page as PDF to share with investors.</div>
+            <button class="btn primary" onclick="window.print()">Print / Save PDF</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODAL -->
+  <div class="backdrop" id="backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Edit ticker">
+      <h3 id="modalTitle">Add ticker</h3>
+      <p class="small muted" id="modalSub">Define position + allocation. Prices update live (demo).</p>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Ticker</label>
+          <input class="input" id="mTicker" placeholder="e.g., UBER"/>
+        </div>
+        <div class="field">
+          <label>Position</label>
+          <select class="select" id="mPos">
+            <option value="QB">QB — Core</option>
+            <option value="OL">OL — Defensive</option>
+            <option value="WR">WR — Growth</option>
+            <option value="RB">RB — Growth</option>
+            <option value="TE">TE — Thematic</option>
+            <option value="K">K — Speculative</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Allocation (%)</label>
+          <input class="input" id="mAlloc" type="number" step="0.5" min="0" max="100" placeholder="e.g., 20"/>
+          <div class="hint">Tip: you can normalize allocations later.</div>
+        </div>
+        <div class="field">
+          <label>Notes (optional)</label>
+          <input class="input" id="mNotes" placeholder="e.g., long-term anchor"/>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="hint">This is a local prototype. Save often.</div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn" id="btnCancel">Cancel</button>
+          <button class="btn primary" id="btnModalSave">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- PLAYER CARD MODAL -->
+  <div class="backdrop" id="playerBackdrop" aria-hidden="true" style="display:none;">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Player card">
+      <h3 style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin:0;">
+        <span id="pcTitle">Ticker</span>
+        <button class="iconbtn" id="pcClose" title="Close">✕</button>
+      </h3>
+      <p class="small muted" id="pcSub" style="margin-top:6px;">Mini player card</p>
+
+      <div class="grid2" style="margin-top:12px;">
+        <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03); padding:14px;">
+          <h2 style="margin:0 0 8px;"><span>Market</span><span class="small">demo</span></h2>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="kpi" style="min-height:auto;">
+              <div class="label">Price</div>
+              <div class="value mono" id="pcPrice">—</div>
+              <div class="delta mono" id="pcTime">—</div>
+            </div>
+            <div class="kpi" style="min-height:auto;">
+              <div class="label">% Change</div>
+              <div class="value mono" id="pcChange">—</div>
+              <div class="delta mono" id="pcPoints">Pts: —</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03); padding:14px;">
+          <h2 style="margin:0 0 8px;"><span>Notes</span><span class="small">from roster</span></h2>
+          <div class="note" id="pcNotes">—</div>
+          <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn" id="pcCopy">Copy ticker</button>
+            <button class="btn primary" id="pcGoEdit">Edit in Playbook</button>
+          </div>
+          <div class="small muted" style="margin-top:10px;">In the real app: add news, fundamentals, and “coach tips”.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ===== CONFIG =====
+    const FINNHUB_API_KEY = "YOUR_FINNHUB_KEY_HERE"; // replace for live prices (do not ship keys client-side)
+    const STORAGE_KEY = "FFL_PLAYBOOK_V4";
+    const LEAGUE_STATE_KEY = "FFL_LEAGUE_STATE_V4";
+    const FREE_AGENTS_KEY = "FFL_FREE_AGENTS_V1";
+    const CHAT_KEY = "FFL_LEAGUE_CHAT_V1";
+    const DRAFT_KEY = "FFL_DRAFT_V1";
+
+    const TEAMS_DEFAULT = [
+      { id:"you",  name:"You (Playbook)", abbr:"YOU" },
+      { id:"opp",  name:"Opponent (Demo)", abbr:"OPP" },
+      { id:"alpha",name:"Alpha Fund", abbr:"ALP" },
+      { id:"beta", name:"Beta Bulls", abbr:"BET" },
+      { id:"gamma",name:"Gamma Growth", abbr:"GAM" },
+      { id:"delta",name:"Delta Defense", abbr:"DEL" },
+    ];
+
+    const DEMO_TICKERS = ["AAPL","MSFT","AMZN","NVDA","TSLA","GOOGL","META","JPM","JNJ","PG","KO","XOM","AMD","NFLX","SHOP","PLTR","COIN","UBER","DIS","COST"];
+
+    const defaultRoster = [
+      {pos:"QB", ticker:"UBER", alloc:30, notes:"Core long-term"},
+      {pos:"OL", ticker:"JNJ", alloc:12, notes:"Defensive"},
+      {pos:"OL", ticker:"PG", alloc:10, notes:"Defensive"},
+      {pos:"OL", ticker:"LMT", alloc:10, notes:"Defensive"},
+      {pos:"WR", ticker:"NVDA", alloc:12, notes:"Growth"},
+      {pos:"RB", ticker:"TSLA", alloc:10, notes:"Volatile growth"},
+      {pos:"TE", ticker:"AMZN", alloc:12, notes:"Thematic"},
+      {pos:"K",  ticker:"COIN", alloc:4,  notes:"Speculative"}
+    ];
+
+    let roster = [];
+    let quotes = {};
+    let editIndex = null;
+    let league = null;
+    let currentTeamId = "you";
+    let freeAgents = [];
+    let chatMessages = [];
+    let draftState = null;
+    let draftTimer = null;
+    let draftSecondsLeft = 0;
+
+    let allocChart = null;
+    let weekChart = null;
+    let teamChart = null;
+
+    const $ = (s)=>document.querySelector(s);
+    const $$ = (s)=>Array.from(document.querySelectorAll(s));
+
+    function toast(msg){
+      const el = $("#toast");
+      el.textContent = msg;
+      el.style.display="block";
+      clearTimeout(window.__t);
+      window.__t = setTimeout(()=>el.style.display="none", 2200);
+    }
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[c]));
+    }
+    function fmtPct(n){ if (n==null || Number.isNaN(n)) return "—"; return (n>=0?"+":"")+n.toFixed(2)+"%"; }
+    function fmtUsd(n){ if (n==null || Number.isNaN(n)) return "—"; return "$"+n.toFixed(2); }
+    function fmtTimeShort(ts){
+      try{ return new Date(ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+      catch{ return "—"; }
+    }
+
+    function getNYTimeParts(){
+      // Use Intl to get America/New_York time parts reliably.
+      const dtf = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York',
+        weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false
+      });
+      const parts = dtf.formatToParts(new Date());
+      const map = Object.fromEntries(parts.map(p=>[p.type,p.value]));
+      const weekday = map.weekday;
+      const hour = parseInt(map.hour,10);
+      const minute = parseInt(map.minute,10);
+      return { weekday, hour, minute };
+    }
+
+    function isMarketOpenNY(){
+      // Simple US equity regular hours heuristic: Mon–Fri 09:30–16:00 ET.
+      // (Ignores holidays/half-days — fine for prototype UI.)
+      const {weekday, hour, minute} = getNYTimeParts();
+      const isWeekday = ['Mon','Tue','Wed','Thu','Fri'].includes(weekday);
+      if (!isWeekday) return false;
+      const mins = hour*60 + minute;
+      const open = 9*60 + 30;
+      const close = 16*60;
+      return mins >= open && mins < close;
+    }
+
+    function renderHeaderStatus(){
+      const weekEl = $("#statusWeek");
+      const marketEl = $("#statusMarket");
+      const dotEl = $("#statusDot");
+      if (!weekEl || !marketEl || !dotEl) return;
+      const wk = league?.week ?? 1;
+      weekEl.textContent = `Week ${wk}`;
+      const open = isMarketOpenNY();
+      marketEl.textContent = open ? 'Markets Open' : 'Markets Closed';
+      dotEl.classList.toggle('open', open);
+      dotEl.classList.toggle('closed', !open);
+    }
+    function pointsFromWeeklyPct(p){ if (p==null || Number.isNaN(p)) return null; return Math.round(p*100); }
+
+    function openPlayerCard(ticker, notes){
+      const t = String(ticker||"").toUpperCase();
+      if (!t) return;
+      const q = quotes[t] || null;
+      const price = (q && typeof q.c==="number") ? fmtUsd(q.c) : "—";
+      const chg = (q && typeof q.dpc==="number") ? fmtPct(q.dpc) : "—";
+      const pts = (q && typeof q.dpc==="number") ? (pointsFromWeeklyPct(q.dpc) ?? "—") : "—";
+      $("#pcTitle").textContent = t;
+      $("#pcSub").textContent = "Player card • price & % change (demo)";
+      $("#pcPrice").textContent = price;
+      const chgEl = $("#pcChange");
+      chgEl.textContent = chg;
+      chgEl.className = "value mono " + ((q && typeof q.dpc==="number") ? (q.dpc>=0?"good":"bad") : "");
+      $("#pcPoints").textContent = "Pts: " + pts;
+      const ts = (q && q.t) ? new Date(q.t*1000).toLocaleTimeString() : "—";
+      $("#pcTime").textContent = "As of: " + ts;
+      $("#pcNotes").textContent = notes ? notes : "—";
+      $("#playerBackdrop").style.display = "flex";
+      $("#playerBackdrop").setAttribute("aria-hidden","false");
+      // actions
+      $("#pcCopy").onclick = async ()=>{
+        try{ await navigator.clipboard.writeText(t); toast("Copied "+t); }
+        catch{ toast("Copy failed"); }
+      };
+      $("#pcGoEdit").onclick = ()=>{
+        // jump to playbook and open edit if ticker exists
+        const idx = roster.findIndex(r=>r.ticker===t);
+        setPage("playbook");
+        if (idx>=0) openEdit(idx);
+        closePlayerCard();
+      };
+    }
+
+    function closePlayerCard(){
+      $("#playerBackdrop").style.display = "none";
+      $("#playerBackdrop").setAttribute("aria-hidden","true");
+    }
+
+    function wireTickerChips(root=document){
+      root.querySelectorAll("[data-ticker]").forEach(el=>{
+        if (el.__wired) return;
+        el.__wired = true;
+        el.addEventListener("click", (e)=>{
+          e.stopPropagation();
+          const t = el.getAttribute("data-ticker");
+          const n = el.getAttribute("data-notes") || "";
+          openPlayerCard(t, n);
+        });
+      });
+    }
+    function posClass(pos){ return "pos-"+pos; }
+    function posLabel(pos){ return ({QB:"QB", OL:"OL", WR:"WR", RB:"RB", TE:"TE", K:"K"}[pos] || pos); }
+
+    function calcQB(){ const qb = roster.find(r=>r.pos==="QB"); return qb ? (+qb.alloc||0) : 0; }
+    function filledCount(){ const hasQB = roster.some(r=>r.pos==="QB"); return {filled: roster.length, total: 8, hasQB}; }
+
+    function weightedToday(){
+      let total=0, wsum=0;
+      for (const r of roster){
+        const q = quotes[r.ticker];
+        if (!q || typeof q.dpc!=="number") continue;
+        const w = (+r.alloc||0);
+        wsum += w;
+        total += q.dpc * w;
+      }
+      if (wsum<=0) return null;
+      return total/wsum;
+    }
+
+    function normalizeAlloc(){
+      const sum = roster.reduce((a,r)=>a+(+r.alloc||0),0);
+      if (sum<=0){ toast("Nothing to normalize."); return; }
+      roster = roster.map(r=>({ ...r, alloc: Math.round((r.alloc/sum)*1000)/10 }));
+      toast("Allocations normalized.");
+      renderAll(); saveRoster();
+    }
+
+    // ===== STORAGE + SHARE =====
+    function saveRoster(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(roster)); toast("Saved."); }
+    function loadFreeAgents(){
+      const raw = localStorage.getItem(FREE_AGENTS_KEY);
+      if (!raw){
+        // sensible defaults
+        freeAgents = ["PLTR","SHOP","AMD","COIN","NFLX","COST","DIS","META","AAPL","MSFT"].filter(t=>!roster.some(r=>r.ticker===t));
+        return;
+      }
+      try{
+        const arr = JSON.parse(raw);
+        freeAgents = Array.isArray(arr) ? arr.map(x=>String(x).toUpperCase()).filter(Boolean) : [];
+        // remove anything already on roster
+        freeAgents = freeAgents.filter(t=>!roster.some(r=>r.ticker===t));
+      }catch{ freeAgents = []; }
+    }
+
+    function saveFreeAgents(){
+      localStorage.setItem(FREE_AGENTS_KEY, JSON.stringify(freeAgents));
+    }
+
+    function loadChat(){
+      const raw = localStorage.getItem(CHAT_KEY);
+      if (!raw){
+        chatMessages = [
+          {id:crypto.randomUUID?.()||String(Date.now()), sender:"Billy", text:"Welcome to Founders League. No excuses this season.", ts: Date.now()-600000},
+          {id:crypto.randomUUID?.()||String(Date.now()+1), sender:"You (Playbook)", text:"Bet. My QB is locked 😤", ts: Date.now()-420000},
+          {id:crypto.randomUUID?.()||String(Date.now()+2), sender:"Dillon", text:"Free agents about to get abused 👀", ts: Date.now()-210000}
+        ];
+        return;
+      }
+      try{ chatMessages = JSON.parse(raw); if (!Array.isArray(chatMessages)) chatMessages = []; }
+      catch{ chatMessages = []; }
+    }
+
+    function saveChat(){
+      localStorage.setItem(CHAT_KEY, JSON.stringify(chatMessages));
+    }
+
+    function loadDraft(){
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw){ draftState = null; return; }
+      try{ draftState = JSON.parse(raw); }
+      catch{ draftState = null; }
+    }
+
+    function saveDraft(){
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draftState));
+    }
+
+    function loadRoster(){
+      const hash = location.hash || "";
+      const m = hash.match(/^#state=(.+)$/);
+      if (m){
+        try{
+          const decoded = JSON.parse(decodeURIComponent(escape(atob(m[1]))));
+          if (decoded && Array.isArray(decoded.roster)){
+            roster = decoded.roster.map(r=>({
+              pos: String(r.pos||"").toUpperCase(),
+              ticker: String(r.ticker||"").toUpperCase(),
+              alloc: +r.alloc || 0,
+              notes: String(r.notes||"")
+            })).filter(r=>r.ticker && r.pos);
+            if (decoded.leagueName) $("#leagueName").textContent = decoded.leagueName;
+            toast("Loaded lineup from link.");
+            return;
+          }
+        }catch(e){ console.warn(e); }
+      }
+
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw){ roster = defaultRoster.slice(); return; }
+      try{ roster = JSON.parse(raw); if (!Array.isArray(roster)) roster = defaultRoster.slice(); }
+      catch{ roster = defaultRoster.slice(); }
+    }
+    function shareLink(){
+      const payload = { roster, leagueName: $("#leagueName").textContent };
+      const enc = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+      const url = location.origin + location.pathname + "#state=" + enc;
+      $("#shareUrl").value = url;
+      toast("Share link generated.");
+      return url;
+    }
+
+    // ===== LEAGUE (STANDINGS + TEAMS) =====
+    function genDemoRoster(seed){
+      // simple deterministic pick order by seed
+      const order = ["QB","OL","OL","OL","WR","RB","TE","K"];
+      const baseAllocs = [30,12,10,10,12,10,12,4];
+      const used = new Set();
+      function pick(i){
+        // deterministic-ish index
+        const idx = (seed*7 + i*13) % DEMO_TICKERS.length;
+        for (let j=0;j<DEMO_TICKERS.length;j++){
+          const t = DEMO_TICKERS[(idx+j) % DEMO_TICKERS.length];
+          if (!used.has(t)){ used.add(t); return t; }
+        }
+        return DEMO_TICKERS[idx];
+      }
+      return order.map((pos,i)=>({ pos, ticker: pick(i), alloc: baseAllocs[i], notes: pos==="QB"?"Core anchor":"—" }));
+    }
+
+    function defaultLeagueState(){
+      const teams = TEAMS_DEFAULT.map((t,i)=>{
+        const demoRoster = (t.id==="you") ? null : genDemoRoster(i+1);
+        return { ...t, w:0, l:0, pf:0, pa:0, streak:"—", last:"—", seed:i+1, roster: demoRoster };
+      });
+      return {
+        week: 1,
+        teams,
+        schedule: [
+          { week:1, home:"you",   away:"opp",   homePts:null, awayPts:null, homePct:null, awayPct:null },
+          { week:1, home:"alpha", away:"beta",  homePts:null, awayPts:null, homePct:null, awayPct:null },
+          { week:1, home:"gamma", away:"delta", homePts:null, awayPts:null, homePct:null, awayPct:null },
+        ]
+      };
+    }
+    function loadLeague(){
+      const raw = localStorage.getItem(LEAGUE_STATE_KEY);
+      if (!raw){ league = defaultLeagueState(); return; }
+      try{
+        league = JSON.parse(raw);
+        if (!league || !Array.isArray(league.teams) || !Array.isArray(league.schedule)) league = defaultLeagueState();
+        // ensure rosters exist for demo teams
+        league.teams.forEach((t,i)=>{
+          if (t.id!=="you" && (!t.roster || !Array.isArray(t.roster) || t.roster.length===0)){
+            t.roster = genDemoRoster(i+1);
+          }
+        });
+      }catch{ league = defaultLeagueState(); }
+    }
+    function saveLeague(){ localStorage.setItem(LEAGUE_STATE_KEY, JSON.stringify(league)); }
+    function resetLeague(){ league = defaultLeagueState(); saveLeague(); renderStandings(); renderMatchup(); renderTeamPage(); toast("League reset."); }
+    function teamById(id){ return league.teams.find(t=>t.id===id); }
+    function mulberry32(a){ return function(){ let t=a+=0x6D2B79F5; t=Math.imul(t^(t>>>15), t|1); t^=t+Math.imul(t^(t>>>7), t|61); return ((t^(t>>>14))>>>0)/4294967296; } }
+
+    function simulateWeek(){
+      const seed = Math.floor(Date.now()/1000) % 100000;
+      const rand = mulberry32(seed);
+
+      const youWeekly = (weightedToday() ?? ((rand()-0.5)*1.2));
+      const youPts = pointsFromWeeklyPct(youWeekly) ?? 0;
+
+      const genTeam = (bias=0)=>{
+        const pct = ((rand()-0.5)*2.2) + bias;
+        return { pct, pts: pointsFromWeeklyPct(pct) };
+      };
+
+      for (const game of league.schedule.filter(g=>g.week===league.week)){
+        let home = teamById(game.home);
+        let away = teamById(game.away);
+        if (!home || !away) continue;
+
+        let homePct, homePts, awayPct, awayPts;
+
+        if (game.home==="you"){ homePct=youWeekly; homePts=youPts; }
+        else { const g=genTeam(0.05); homePct=g.pct; homePts=g.pts; }
+
+        if (game.away==="opp"){ const g=genTeam(0.02); awayPct=g.pct; awayPts=g.pts; }
+        else { const g=genTeam(0.00); awayPct=g.pct; awayPts=g.pts; }
+
+        game.homePct=homePct; game.awayPct=awayPct;
+        game.homePts=homePts; game.awayPts=awayPts;
+
+        home.pf += homePts; home.pa += awayPts;
+        away.pf += awayPts; away.pa += homePts;
+
+        if (homePts > awayPts){ home.w+=1; away.l+=1; home.last="W"; away.last="L"; }
+        else if (awayPts > homePts){ away.w+=1; home.l+=1; away.last="W"; home.last="L"; }
+        else { home.last="T"; away.last="T"; }
+
+        home.streak = home.last;
+        away.streak = away.last;
+      }
+
+      saveLeague();
+      renderStandings();
+      renderMatchup();
+      renderTeamPage();
+      toast("Week simulated.");
+    }
+
+    function standingsSort(a,b){
+      if (b.w!==a.w) return b.w-a.w;
+      if (b.pf!==a.pf) return b.pf-a.pf;
+      if (a.pa!==b.pa) return a.pa-b.pa;
+      return a.name.localeCompare(b.name);
+    }
+
+    function initialsForTeam(t){
+      return (t.abbr || t.name.split(" ").map(s=>s[0]).slice(0,3).join("").toUpperCase()).slice(0,3);
+    }
+
+    function getTeamQB(teamId){
+      if (teamId==="you") return roster.find(r=>r.pos==="QB")?.ticker || "—";
+      const t = teamById(teamId);
+      return t?.roster?.find(r=>r.pos==="QB")?.ticker || "—";
+    }
+
+    function renderStandings(){
+      $("#standingsSub").textContent = `Week ${league.week} • Demo`;
+      const body = $("#standingsBody");
+      body.innerHTML = "";
+      const sorted = league.teams.slice().sort(standingsSort);
+
+      for (let i=0;i<sorted.length;i++){
+        const t = sorted[i];
+        const tr = document.createElement("tr");
+        tr.classList.add("clickable");
+        if (t.id==="you") tr.classList.add("highlight-row");
+        const qb = getTeamQB(t.id);
+        tr.innerHTML = `
+          <td class="rank">${i+1}</td>
+          <td>
+            <div class="teamcell">
+              <span class="avatar">${escapeHtml(initialsForTeam(t))}</span>
+              <div>
+                <div style="font-weight:800; letter-spacing:.2px;">${escapeHtml(t.name)}</div>
+                <div class="small muted">QB: <span class="mono">${escapeHtml(qb)}</span></div>
+              </div>
+            </div>
+          </td>
+          <td class="right mono">${t.w}‑${t.l}</td>
+          <td class="right mono">${t.pf}</td>
+          <td class="right mono">${t.pa}</td>
+          <td class="right mono">${escapeHtml(t.streak||"—")}</td>
+          <td class="right mono">${escapeHtml(t.last||"—")}</td>
+        `;
+        tr.addEventListener("click", ()=> openTeam(t.id));
+        body.appendChild(tr);
+      }
+    }
+
+    function findGameForTeam(teamId, week){
+      return league.schedule.find(g=>g.week===week && (g.home===teamId || g.away===teamId));
+    }
+
+    function renderTeamSelector(){
+      const sel = $("#teamSelect");
+      sel.innerHTML = "";
+      league.teams.forEach(t=>{
+        const opt = document.createElement("option");
+        opt.value = t.id;
+        opt.textContent = t.name;
+        sel.appendChild(opt);
+      });
+      sel.value = currentTeamId;
+    }
+
+    function renderTeamRoster(teamId){
+      const tbody = $("#teamRosterBody");
+      tbody.innerHTML = "";
+      const rows = (teamId==="you") ? roster : (teamById(teamId)?.roster || []);
+      const order = {QB:0, OL:1, WR:2, RB:3, TE:4, K:5};
+      const sorted = rows.slice().sort((a,b)=>(order[a.pos]??99)-(order[b.pos]??99));
+
+      for (const r of sorted){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="badge ${posClass(r.pos)}"><span class="dot"></span>${posLabel(r.pos)}</span></td>
+          <td><span class="tickerchip" data-ticker="${escapeHtml(r.ticker)}" data-notes="${escapeHtml(r.notes||"")}"><span class="spark"></span>${escapeHtml(r.ticker)}</span></td>
+          <td class="right mono">${(+r.alloc||0).toFixed(1)}%</td>
+          <td class="right">${escapeHtml(r.notes || "—")}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+      wireTickerChips(tbody);
+    }
+
+    function renderTeamWeeks(teamId){
+      const tbody = $("#teamWeeksBody");
+      tbody.innerHTML = "";
+      // For now, only week 1 exists in schedule; but render a small list (1..4) as placeholders.
+      const weeksToShow = [1,2,3,4];
+      for (const w of weeksToShow){
+        const g = findGameForTeam(teamId, w);
+        let opp = "—", pts="—", res="—";
+        if (g){
+          const isHome = g.home===teamId;
+          const myPts = isHome ? g.homePts : g.awayPts;
+          const oppId = isHome ? g.away : g.home;
+          opp = teamById(oppId)?.name || oppId;
+          pts = (typeof myPts==="number") ? String(myPts) : "—";
+          if (typeof g.homePts==="number" && typeof g.awayPts==="number"){
+            const my = myPts;
+            const their = isHome ? g.awayPts : g.homePts;
+            res = (my>their) ? "W" : (my<their) ? "L" : "T";
+          }
+        }
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="mono">Week ${w}</td>
+          <td>${escapeHtml(opp)}</td>
+          <td class="right mono">${escapeHtml(pts)}</td>
+          <td class="right mono">${escapeHtml(res)}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+    function renderTeamChart(teamId){
+      const canvas = $("#teamChart");
+      if (!canvas) return;
+
+      // Build Week 1..18 dataset (null when no result yet)
+      const labels = Array.from({length: 18}, (_,i)=>`W${i+1}`);
+      const data = Array.from({length: 18}, ()=>null);
+
+      for (const g of league.schedule){
+        if (g.week < 1 || g.week > 18) continue;
+        if (g.home !== teamId && g.away !== teamId) continue;
+
+        const isHome = g.home === teamId;
+        const myPts = isHome ? g.homePts : g.awayPts;
+        if (typeof myPts === "number") data[g.week-1] = myPts;
+      }
+
+      const ctx = canvas.getContext("2d");
+      if (teamChart) teamChart.destroy();
+
+      teamChart = new Chart(ctx,{
+        type:"line",
+        data:{
+          labels,
+          datasets:[{
+            label:"Points by Week",
+            data,
+            tension:0.35,
+            borderWidth:2,
+            pointRadius:3,
+            pointHoverRadius:4,
+            borderColor:"rgba(124,92,255,.85)",
+            backgroundColor:"rgba(124,92,255,.12)",
+            fill:true
+          }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins:{
+            legend:{ labels:{ color:"rgba(233,237,247,.72)", font:{size:11}} },
+            tooltip:{ enabled:true }
+          },
+          scales:{
+            x:{ ticks:{ color:"rgba(233,237,247,.65)", font:{size:11}}, grid:{ color:"rgba(255,255,255,.06)"} },
+            y:{ ticks:{ color:"rgba(233,237,247,.65)", font:{size:11}}, grid:{ color:"rgba(255,255,255,.06)"} }
+          }
+        }
+      });
+    }
+
+
+    function renderTeamHeader(teamId){
+      const t = teamById(teamId);
+      const name = t?.name || "Team";
+      $("#teamName").textContent = name;
+      $("#teamAvatar").textContent = initialsForTeam(t || {name});
+      $("#teamRecord").textContent = `${t?.w ?? 0}‑${t?.l ?? 0}`;
+      $("#teamPF").textContent = String(t?.pf ?? 0);
+      $("#teamQB").textContent = getTeamQB(teamId);
+    }
+
+    function renderChatSender(){
+      const sel = $("#chatSender");
+      if (!sel) return;
+      sel.innerHTML = "";
+      (league?.teams || []).forEach(t=>{
+        const opt = document.createElement("option");
+        opt.value = t.name;
+        opt.textContent = t.name;
+        sel.appendChild(opt);
+      });
+      // default to you
+      const you = league?.teams?.find(t=>t.id==="you")?.name || "You (Playbook)";
+      sel.value = you;
+    }
+
+    function renderTeamPage(){
+      renderTeamSelector();
+      renderTeamHeader(currentTeamId);
+      renderTeamRoster(currentTeamId);
+      renderTeamWeeks(currentTeamId);
+      renderTeamChart(currentTeamId);
+    }
+
+    function openTeam(teamId){
+      currentTeamId = teamId;
+      setPage("team");
+      renderTeamPage();
+      toast("Opened team page.");
+    }
+
+    // ===== QUOTES =====
+    async function fetchQuote(ticker){
+      const url = `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(ticker)}&token=${encodeURIComponent(FINNHUB_API_KEY)}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Quote fetch failed");
+      const data = await res.json();
+      return { c:(typeof data.c==="number"?data.c:null), dpc:(typeof data.dp==="number"?data.dp:null), t:data.t||null };
+    }
+
+    async function refreshQuotes(){
+      if (!FINNHUB_API_KEY || FINNHUB_API_KEY==="YOUR_FINNHUB_KEY_HERE"){
+        const now = Date.now();
+        for (const r of roster){
+          if (!quotes[r.ticker]){
+            const base = 50 + (Math.random()*200);
+            quotes[r.ticker] = {c: base, dpc: 0, t: Math.floor(now/1000)};
+          }
+          const q = quotes[r.ticker];
+          const drift = (Math.random()-0.5)*0.8;
+          q.dpc = drift;
+          q.c = Math.max(1, q.c * (1 + drift/100));
+          q.t = Math.floor(now/1000);
+        }
+        renderAll();
+        return;
+      }
+      const uniq = Array.from(new Set(roster.map(r=>r.ticker.toUpperCase())));
+      await Promise.allSettled(uniq.map(async t=>{ try{ quotes[t]=await fetchQuote(t); }catch(e){ console.warn(e); } }));
+      renderAll();
+    }
+
+    // ===== RENDER PLAYBOOK =====
+    function getFilteredSorted(){
+      const q = ($("#search").value||"").trim().toUpperCase();
+      const pos = $("#filterPos").value;
+      let rows = roster.map((r,idx)=>({ ...r, _idx: idx }));
+      if (q) rows = rows.filter(r=>r.ticker.includes(q) || r.pos.includes(q) || (r.notes||"").toUpperCase().includes(q));
+      if (pos) rows = rows.filter(r=>r.pos===pos);
+
+      const sort = $("#sortBy").value;
+      if (sort==="allocDesc") rows.sort((a,b)=>(+b.alloc||0)-(+a.alloc||0));
+      else if (sort==="todayDesc") rows.sort((a,b)=>(quotes[b.ticker]?.dpc??-999)-(quotes[a.ticker]?.dpc??-999));
+      else {
+        const order={QB:0,OL:1,WR:2,RB:3,TE:4,K:5};
+        rows.sort((a,b)=>(order[a.pos]??99)-(order[b.pos]??99) || a.ticker.localeCompare(b.ticker));
+      }
+      return rows;
+    }
+
+    function renderTable(){
+      const rows = getFilteredSorted();
+      const tbody = $("#tbody");
+      tbody.innerHTML="";
+      for (const r of rows){
+        const q = quotes[r.ticker] || {};
+        const today = (typeof q.dpc==="number") ? q.dpc : null;
+        const pts = pointsFromWeeklyPct(today);
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="badge ${posClass(r.pos)}"><span class="dot"></span>${posLabel(r.pos)}</span></td>
+          <td><span class="tickerchip" data-ticker="${escapeHtml(r.ticker)}" data-notes="${escapeHtml(r.notes||"")}"><span class="spark"></span>${escapeHtml(r.ticker)}</span></td>
+          <td class="right mono">${(+r.alloc||0).toFixed(1)}%</td>
+          <td class="right mono">${fmtUsd(q.c)}</td>
+          <td class="right mono ${(today??0)>=0?'good':'bad'}">${fmtPct(today)}</td>
+          <td class="right mono">${pts==null?"—":pts}</td>
+          <td class="right">
+            <div class="actions">
+              <button class="iconbtn" title="Edit" data-action="edit" data-idx="${r._idx}">✎</button>
+              <button class="iconbtn" title="Delete" data-action="del" data-idx="${r._idx}">🗑</button>
+            </div>
+          </td>
+        `;
+        tr.addEventListener("click",(e)=>{ if (e.target.closest("button")) return; openEdit(r._idx); });
+        tbody.appendChild(tr);
+      }
+      wireTickerChips(tbody);
+      tbody.querySelectorAll("button[data-action]").forEach(btn=>{
+        btn.addEventListener("click",(e)=>{
+          e.stopPropagation();
+          const idx=+btn.dataset.idx;
+          const act=btn.dataset.action;
+          if (act==="edit") openEdit(idx);
+          if (act==="del") delRow(idx);
+        });
+      });
+
+      const cards = $("#cards");
+      if (window.matchMedia("(max-width: 820px)").matches){
+        cards.style.display="grid";
+        cards.innerHTML="";
+        for (const r of rows){
+          const q = quotes[r.ticker] || {};
+          const today = (typeof q.dpc==="number") ? q.dpc : null;
+          const pts = pointsFromWeeklyPct(today);
+          const div=document.createElement("div");
+          div.className="rowcard";
+          div.innerHTML = `
+            <div class="rowtop">
+              <span class="badge ${posClass(r.pos)}"><span class="dot"></span>${posLabel(r.pos)}</span>
+              <div class="actions">
+                <button class="iconbtn" title="Edit" data-action="edit" data-idx="${r._idx}">✎</button>
+                <button class="iconbtn" title="Delete" data-action="del" data-idx="${r._idx}">🗑</button>
+              </div>
+            </div>
+            <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+              <div><span class="tickerchip" data-ticker="${escapeHtml(r.ticker)}" data-notes="${escapeHtml(r.notes||"")}"><span class="spark"></span>${escapeHtml(r.ticker)}</span></div>
+              <div class="mono" style="color:rgba(233,237,247,.70);">${(+r.alloc||0).toFixed(1)}%</div>
+            </div>
+            <div class="rowmain">
+              <div class="kv"><div class="k">Price</div><div class="v">${fmtUsd(q.c)}</div></div>
+              <div class="kv"><div class="k">Today</div><div class="v ${(today??0)>=0?'good':'bad'}">${fmtPct(today)}</div></div>
+              <div class="kv"><div class="k">Pts (wk)</div><div class="v">${pts==null?"—":pts}</div></div>
+              <div class="kv"><div class="k">Notes</div><div class="v">${escapeHtml(r.notes||"—")}</div></div>
+            </div>
+          `;
+          div.querySelectorAll("button[data-action]").forEach(btn=>{
+            btn.addEventListener("click",(e)=>{
+              e.stopPropagation();
+              const idx=+btn.dataset.idx;
+              const act=btn.dataset.action;
+              if (act==="edit") openEdit(idx);
+              if (act==="del") delRow(idx);
+            });
+          });
+          div.addEventListener("click",()=>openEdit(r._idx));
+          cards.appendChild(div);
+        }
+        wireTickerChips(cards);
+      } else {
+        cards.style.display="none";
+      }
+    }
+
+    function renderKpis(){
+      const notional=10000;
+      $("#kpiValue").textContent="$"+notional.toLocaleString();
+      $("#kpiValueSub").textContent="Target: $"+notional.toLocaleString();
+
+      const wt = weightedToday();
+      $("#kpiToday").textContent = wt==null ? "—%" : fmtPct(wt);
+      $("#kpiToday").className = "value " + (wt==null ? "" : (wt>=0?"good":"bad"));
+      const t = roster.length ? (quotes[roster[0].ticker]?.t || null) : null;
+      $("#kpiTodaySub").textContent = "Last refresh: " + (t ? new Date(t*1000).toLocaleTimeString() : "—");
+
+      $("#kpiQB").textContent = calcQB().toFixed(1)+"%";
+      const fc = filledCount();
+      $("#kpiFilled").textContent = fc.filled+"/"+fc.total;
+      $("#kpiFilledSub").textContent = fc.hasQB ? "QB locked ✅" : "QB missing ⚠️";
+    }
+
+    function renderCharts(){
+      const posTotals={QB:0,OL:0,WR:0,RB:0,TE:0,K:0};
+      for (const r of roster) posTotals[r.pos]=(posTotals[r.pos]||0)+(+r.alloc||0);
+      const labels=Object.keys(posTotals);
+      const values=labels.map(k=>Math.round(posTotals[k]*10)/10);
+
+      const ctx=$("#chartAlloc").getContext("2d");
+      if (allocChart) allocChart.destroy();
+      allocChart=new Chart(ctx,{
+        type:"doughnut",
+        data:{ labels, datasets:[{ data:values, borderWidth:1, borderColor:"rgba(255,255,255,.18)",
+          backgroundColor:["rgba(124,92,255,.70)","rgba(53,208,127,.68)","rgba(37,194,255,.64)","rgba(255,200,87,.62)","rgba(167,255,131,.60)","rgba(255,90,122,.58)"] }] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{color:"rgba(233,237,247,.72)", font:{size:11}} } }, cutout:"62%" }
+      });
+
+      const rows=getFilteredSorted().slice(0,8);
+      const weekLabels=rows.map(r=>r.ticker);
+      const weekVals=rows.map(r=>{
+        const q=quotes[r.ticker]; const pct=(q && typeof q.dpc==="number")?q.dpc:0; return Math.round(pct*100)/100;
+      });
+
+      const ctx2=$("#chartWeek")?.getContext("2d");
+      if (ctx2){
+        if (weekChart) weekChart.destroy();
+        weekChart=new Chart(ctx2,{
+          type:"bar",
+          data:{ labels:weekLabels, datasets:[{ label:"Today % (proxy for weekly)", data:weekVals, borderWidth:1, borderColor:"rgba(255,255,255,.18)", backgroundColor:"rgba(37,194,255,.45)" }] },
+          options:{ responsive:true, maintainAspectRatio:false,
+            scales:{ x:{ticks:{color:"rgba(233,237,247,.72)", font:{size:11}}}, y:{ticks:{color:"rgba(233,237,247,.72)", font:{size:11}}} },
+            plugins:{ legend:{labels:{color:"rgba(233,237,247,.72)", font:{size:11}}} }
+          }
+        });
+      }
+    }
+
+    function addToRosterFromFA(ticker){
+      const t = String(ticker||"").toUpperCase();
+      if (!t) return;
+      if (roster.some(r=>r.ticker===t)){ toast(t+" is already on your roster."); return; }
+      roster.push({ pos:"WR", ticker:t, alloc:5, notes:"" });
+      // remove from free agents
+      freeAgents = freeAgents.filter(x=>x!==t);
+      saveFreeAgents();
+      toast("Added "+t+" to roster");
+      renderAll();
+      saveRoster();
+    }
+
+    function dropFreeAgent(ticker){
+      const t = String(ticker||"").toUpperCase();
+      freeAgents = freeAgents.filter(x=>x!==t);
+      saveFreeAgents();
+      toast("Removed "+t+" from watchlist");
+      if ($("#faInput")) $("#faInput").value = "";
+      renderFreeAgents();
+    }
+
+    function addFreeAgent(ticker){
+      const t = String(ticker||"").trim().toUpperCase();
+      if (!t) return;
+      if (roster.some(r=>r.ticker===t)){ toast(t+" is already on your roster."); return; }
+      if (freeAgents.includes(t)){ toast(t+" is already in Free Agents."); return; }
+      freeAgents.unshift(t);
+      saveFreeAgents();
+      toast("Added "+t+" to Free Agents");
+      renderFreeAgents();
+    }
+
+    function renderChat(){
+      const list = $("#chatList");
+      if (!list) return;
+      list.innerHTML = "";
+      $("#chatWeek").textContent = String(league?.week ?? 1);
+      const me = $("#chatSender")?.value || "You (Playbook)";
+      for (const m of chatMessages.slice(-200)){
+        const div = document.createElement("div");
+        div.className = "msg" + (m.sender===me ? " me" : "");
+        const initials = (m.sender||"?").split(" ").map(s=>s[0]).slice(0,3).join("").toUpperCase();
+        div.innerHTML = `
+          <span class="avatar">${escapeHtml(initials)}</span>
+          <div class="bubble">
+            <div class="meta">
+              <div class="name">${escapeHtml(m.sender||"Unknown")}</div>
+              <div class="time">${escapeHtml(fmtTimeShort(m.ts))}</div>
+            </div>
+            <div class="text">${escapeHtml(m.text||"")}</div>
+          </div>
+        `;
+        list.appendChild(div);
+      }
+      // scroll to bottom
+      list.scrollTop = list.scrollHeight;
+      renderChatPulse();
+    }
+
+    function renderChatPulse(){
+      const top = league?.teams?.slice()?.sort((a,b)=>(b.pf-a.pf))[0];
+      $("#pulseTopPF").textContent = top ? `${top.name} (${top.pf} PF)` : "—";
+      const hot = league?.teams?.slice()?.sort((a,b)=>(b.w-a.w) || (b.pf-a.pf))[0];
+      $("#pulseHot").textContent = hot ? `${hot.name} (${hot.w}-${hot.l})` : "—";
+      const last = chatMessages[chatMessages.length-1];
+      $("#pulseLast").textContent = last ? `${last.sender}: ${(last.text||"").slice(0,22)}${(last.text||"").length>22?'…':''}` : "—";
+    }
+
+    function ensureDraftPool(){
+      // pool = free agents + some mega-cap defaults
+      const defaults = ["NVDA","AAPL","MSFT","AMZN","GOOGL","META","TSLA","NFLX","COST","AMD","INTC","AVGO","QCOM","ORCL","CRM","ADBE","JPM","V","MA","BRK.B","LLY","UNH","XOM","CVX","KO","PEP","WMT","DIS","PLTR","COIN","SHOP","SPOT","UBER","SNOW","SMCI","MU","PANW","CRWD","ASML","TSM","NVO","ABBV"];
+      const base = Array.from(new Set([...(freeAgents||[]), ...defaults].map(t=>String(t).toUpperCase())));
+      // remove anything already drafted
+      const drafted = new Set((draftState?.picks||[]).map(p=>p.ticker));
+      return base.filter(t=>!drafted.has(t));
+    }
+
+    function buildSnakeOrder(teamIds, round){
+      const r = round % 2 === 1 ? teamIds : teamIds.slice().reverse();
+      return r;
+    }
+
+    function initDraft(){
+      const teams = (league?.teams||[]).map(t=>t.id);
+      const rounds = Math.max(1, Math.min(30, parseInt($("#draftRounds")?.value||"8",10)));
+      const clock = Math.max(5, Math.min(300, parseInt($("#draftClock")?.value||"45",10)));
+      draftState = {
+        started: true,
+        paused: true,
+        rounds,
+        clock,
+        teamIds: teams,
+        pickIndex: 0, // 0..(rounds*teams-1)
+        picks: [] // {pickNo, round, slot, teamId, ticker, ts}
+      };
+      draftSecondsLeft = clock;
+      saveDraft();
+    }
+
+    function totalDraftPicks(){
+      if (!draftState) return 0;
+      return draftState.rounds * draftState.teamIds.length;
+    }
+
+    function currentPickMeta(){
+      if (!draftState) return null;
+      const teamsN = draftState.teamIds.length;
+      const pickNo = draftState.pickIndex + 1;
+      const round = Math.floor(draftState.pickIndex / teamsN) + 1;
+      const slotInRound = (draftState.pickIndex % teamsN); // 0..teams-1 in snake order
+      const order = buildSnakeOrder(draftState.teamIds, round);
+      const teamId = order[slotInRound];
+      return { pickNo, round, slotInRound, teamId, order };
+    }
+
+    function pauseDraft(){
+      if (!draftState) return;
+      draftState.paused = true;
+      if (draftTimer){ clearInterval(draftTimer); draftTimer = null; }
+      saveDraft();
+      renderDraft();
+    }
+
+    function startDraft(){
+      if (!draftState) initDraft();
+      draftState.started = true;
+      draftState.paused = false;
+      draftState.clock = Math.max(5, Math.min(300, parseInt($("#draftClock")?.value||draftState.clock||"45",10)));
+      draftState.rounds = Math.max(1, Math.min(30, parseInt($("#draftRounds")?.value||draftState.rounds||"8",10)));
+      // reset seconds if needed
+      if (!draftSecondsLeft || draftSecondsLeft > draftState.clock) draftSecondsLeft = draftState.clock;
+      saveDraft();
+      if (draftTimer) clearInterval(draftTimer);
+      draftTimer = setInterval(()=>{
+        if (!draftState || draftState.paused) return;
+        draftSecondsLeft = Math.max(0, (draftSecondsLeft||0) - 1);
+        renderDraftHeader();
+        if (draftSecondsLeft === 0){
+          autoPick();
+        }
+      }, 1000);
+      renderDraft();
+    }
+
+    function resetDraft(){
+      draftState = null;
+      draftSecondsLeft = 0;
+      if (draftTimer){ clearInterval(draftTimer); draftTimer = null; }
+      localStorage.removeItem(DRAFT_KEY);
+      renderDraft();
+    }
+
+    function makePick(ticker){
+      if (!draftState || draftState.paused) return;
+      const meta = currentPickMeta();
+      if (!meta) return;
+      const t = String(ticker||"").trim().toUpperCase();
+      if (!t) return;
+
+      // already drafted?
+      if (draftState.picks.some(p=>p.ticker===t)){ toast(t+" already drafted."); return; }
+
+      // validate ticker chars
+      if (!/^[A-Z\.]{1,7}$/.test(t)){ toast("Invalid ticker"); return; }
+
+      draftState.picks.push({
+        pickNo: meta.pickNo,
+        round: meta.round,
+        slot: meta.slotInRound,
+        teamId: meta.teamId,
+        ticker: t,
+        ts: Date.now()
+      });
+      draftState.pickIndex += 1;
+
+      // reset clock for next pick
+      draftSecondsLeft = draftState.clock;
+
+      // end draft
+      if (draftState.pickIndex >= totalDraftPicks()){
+        pauseDraft();
+        toast("Draft complete.");
+      } else {
+        saveDraft();
+        renderDraft();
+      }
+    }
+
+    function autoPick(){
+      if (!draftState || draftState.paused) return;
+      const pool = ensureDraftPool();
+      if (!pool.length){ toast("No tickers left in pool."); pauseDraft(); return; }
+      // simple: pick random from top 12-ish for variety
+      const idx = Math.floor(Math.random() * Math.min(12, pool.length));
+      makePick(pool[idx]);
+    }
+
+    function importMyDraftToPlaybook(){
+      if (!draftState) return;
+      const youId = "you";
+      const picked = draftState.picks.filter(p=>p.teamId===youId).map(p=>p.ticker);
+      if (!picked.length){ toast("No picks for your team yet."); return; }
+      let added = 0;
+      for (const t of picked){
+        if (roster.some(r=>r.ticker===t)) continue;
+        roster.push({ pos:"WR", ticker:t, alloc:5, notes:"Draft pick" });
+        added += 1;
+      }
+      saveRoster();
+      toast("Imported "+added+" to Playbook");
+      renderAll();
+    }
+
+    function renderDraftHeader(){
+      const teamsN = (league?.teams||[]).length || 0;
+      $("#draftTeamsCount").textContent = teamsN ? String(teamsN) : "—";
+      $("#draftRoundsChip").textContent = draftState ? String(draftState.rounds) : String($("#draftRounds")?.value||"8");
+      if (!draftState || !draftState.started){
+        $("#draftOnClock").textContent = "—";
+        return;
+      }
+      const meta = currentPickMeta();
+      const name = meta ? (teamById(meta.teamId)?.name || meta.teamId) : "—";
+      $("#draftOnClock").textContent = `${name} • ${draftSecondsLeft||draftState.clock}s`;
+    }
+
+    function renderDraftPool(){
+      const wrap = $("#draftPool");
+      if (!wrap) return;
+      const q = String($("#draftSearch")?.value||"").trim().toUpperCase();
+      const pool = ensureDraftPool().filter(t=>!q || t.includes(q));
+      wrap.innerHTML = "";
+      if (!pool.length){
+        wrap.innerHTML = '<div class="small muted">No available tickers match your search.</div>';
+        return;
+      }
+      for (const t of pool.slice(0, 80)){
+        const el = document.createElement("span");
+        el.className = "tickerchip";
+        el.setAttribute("data-ticker", t);
+        el.setAttribute("data-notes","Draft pool");
+        el.innerHTML = '<span class="spark"></span>'+escapeHtml(t);
+        el.addEventListener("click", ()=> makePick(t));
+        wrap.appendChild(el);
+      }
+    }
+
+    function renderDraftBoard(){
+      const board = $("#draftBoard");
+      if (!board) return;
+      const teams = league?.teams || [];
+      const teamsN = teams.length;
+      const rounds = draftState ? draftState.rounds : Math.max(1, parseInt($("#draftRounds")?.value||"8",10));
+
+      board.style.setProperty("--teams", String(teamsN));
+
+      // Header row
+      let html = "";
+      html += '<div class="boardGrid boardHdr" style="--teams:'+teamsN+'">';
+      html += '<div class="cell r">R</div>';
+      for (const t of teams){
+        html += '<div class="cell"><div class="pickTeam">'+escapeHtml(t.name)+'</div></div>';
+      }
+      html += '</div>';
+
+      // Picks matrix lookup
+      const pickMap = new Map();
+      if (draftState){
+        for (const p of draftState.picks){
+          // Determine column by team position in that round's snake order
+          const order = buildSnakeOrder(draftState.teamIds, p.round);
+          const col = order.indexOf(p.teamId); // 0..teams-1
+          pickMap.set(`${p.round}:${col}`, p);
+        }
+      }
+
+      const meta = currentPickMeta();
+
+      for (let r=1; r<=rounds; r++){
+        const order = buildSnakeOrder((league?.teams||[]).map(t=>t.id), r);
+        html += '<div class="boardGrid" style="--teams:'+teamsN+'">';
+        html += '<div class="cell r">'+r+'</div>';
+        for (let c=0; c<teamsN; c++){
+          const p = pickMap.get(`${r}:${c}`) || null;
+          const isOnClock = draftState && meta && meta.round===r && meta.slotInRound===c && !draftState.paused && draftState.pickIndex < totalDraftPicks();
+          if (p){
+            const teamName = teamById(p.teamId)?.name || p.teamId;
+            html += '<div class="cell pickCell'+(isOnClock?' onClock':'')+'">'
+                    +'<div class="pickTop"><span class="pickT">'+escapeHtml(p.ticker)+'</span><span class="pickNo">#'+p.pickNo+'</span></div>'
+                    +'<div class="pickTeam">'+escapeHtml(teamName)+'</div>'
+                    +'</div>';
+          } else {
+            const pickNo = (r-1)*teamsN + (c+1);
+            const teamId = order[c];
+            const teamName = teamById(teamId)?.name || teamId;
+            html += '<div class="cell pickCell'+(isOnClock?' onClock':'')+'">'
+                    +'<div class="pickTop"><span class="pickT muted">—</span><span class="pickNo">#'+pickNo+'</span></div>'
+                    +'<div class="pickTeam">'+escapeHtml(teamName)+'</div>'
+                    +'</div>';
+          }
+        }
+        html += '</div>';
+      }
+
+      board.innerHTML = html;
+    }
+
+    function renderDraftLog(){
+      const log = $("#draftLog");
+      if (!log) return;
+      if (!draftState || !draftState.picks.length){
+        log.innerHTML = '<div class="small muted">No picks yet.</div>';
+        return;
+      }
+      const items = draftState.picks.slice().reverse().slice(0, 80);
+      log.innerHTML = items.map(p=>{
+        const teamName = teamById(p.teamId)?.name || p.teamId;
+        return `
+          <div class="draftLogItem">
+            <div class="left">
+              <div class="small muted">Round ${p.round} • Pick #${p.pickNo}</div>
+              <div style="margin-top:4px;"><span class="tickerchip" data-ticker="${escapeHtml(p.ticker)}" data-notes="Draft pick"><span class="spark"></span>${escapeHtml(p.ticker)}</span></div>
+              <div class="small muted" style="margin-top:6px;">${escapeHtml(teamName)}</div>
+            </div>
+            <div class="right">${escapeHtml(fmtTimeShort(p.ts))}</div>
+          </div>
+        `;
+      }).join("");
+      wireTickerChips(log);
+    }
+
+    function renderDraft(){
+      renderDraftHeader();
+      renderDraftPool();
+      renderDraftBoard();
+      renderDraftLog();
+    }
+    function awardRow(title, desc, val, cls=""){
+      return `
+        <div class="awardItem">
+          <div>
+            <div class="title">${escapeHtml(title)}</div>
+            <div class="desc">${escapeHtml(desc)}</div>
+          </div>
+          <div class="val ${cls}">${escapeHtml(val)}</div>
+        </div>
+      `;
+    }
+
+    function getWeekGames(week){
+      return (league?.schedule || []).filter(g=>g.week===week);
+    }
+
+    function renderAwards(){
+      const sub = $("#awardsSub");
+      if (!sub) return;
+      const wk = league?.week ?? 1;
+      sub.textContent = `Week ${wk} • Demo`;
+
+      const games = getWeekGames(wk).filter(g=>typeof g.homePts==="number" && typeof g.awayPts==="number");
+      const leagueBox = $("#leagueAwards");
+      const yourBox = $("#yourAwards");
+      const receipt = $("#awardsReceipt");
+
+      if (!games.length){
+        leagueBox.innerHTML = '<div class="small muted">No results yet. Click “Simulate Week” to generate Week '+wk+' awards.</div>';
+        yourBox.innerHTML = '<div class="small muted">Your lineup awards appear after prices refresh (or after a simulation).</div>';
+        receipt.innerHTML = '<div class="small muted">Simulate Week to generate a shareable receipt.</div>';
+        return;
+      }
+
+      // League awards
+      let topTeam = null, topPts = -1e9;
+      let lowTeam = null, lowPts = 1e9;
+      let closest = null, closestDiff = 1e9;
+      let blowout = null, blowoutDiff = -1e9;
+
+      for (const g of games){
+        const home = teamById(g.home);
+        const away = teamById(g.away);
+        const hp = g.homePts, ap = g.awayPts;
+        const diff = Math.abs(hp-ap);
+
+        if (hp > topPts){ topPts = hp; topTeam = home?.name || g.home; }
+        if (ap > topPts){ topPts = ap; topTeam = away?.name || g.away; }
+
+        if (hp < lowPts){ lowPts = hp; lowTeam = home?.name || g.home; }
+        if (ap < lowPts){ lowPts = ap; lowTeam = away?.name || g.away; }
+
+        if (diff < closestDiff){ closestDiff = diff; closest = {a: home?.name||g.home, b: away?.name||g.away, hp, ap}; }
+        if (diff > blowoutDiff){ blowoutDiff = diff; blowout = {a: home?.name||g.home, b: away?.name||g.away, hp, ap}; }
+      }
+
+      const upset = games[0] ? (()=>{
+        // Simple: upset = winner had lower PF entering the week (approx using current PF-pts as "entering")
+        const g = games[0];
+        const home = teamById(g.home), away = teamById(g.away);
+        const hp=g.homePts, ap=g.awayPts;
+        const winner = hp>=ap ? home : away;
+        const loser  = hp>=ap ? away : home;
+        const wEnter = (winner?.pf ?? 0) - Math.max(hp,ap);
+        const lEnter = (loser?.pf ?? 0) - Math.min(hp,ap);
+        const isUpset = wEnter < lEnter;
+        return { isUpset, winner: winner?.name||"—", loser: loser?.name||"—", margin: Math.abs(hp-ap) };
+      })() : {isUpset:false};
+
+      let leagueHtml = "";
+      leagueHtml += awardRow("High Score", "Top points scored in the league this week.", `${topTeam} • ${topPts} pts`, "good");
+      leagueHtml += awardRow("Low Score", "Tough week… lowest points in the league.", `${lowTeam} • ${lowPts} pts`, "bad");
+      leagueHtml += awardRow("Nail‑Biter", "Closest matchup (smallest margin).", `${closest.a} vs ${closest.b} • Δ${closestDiff}`, "");
+      leagueHtml += awardRow("Blowout", "Biggest margin of victory.", `${blowout.a} vs ${blowout.b} • Δ${blowoutDiff}`, "");
+      if (upset.isUpset){
+        leagueHtml += awardRow("Upset Alert", "Winner entered the week behind in total PF (approx).", `${upset.winner} over ${upset.loser} • Δ${upset.margin}`, "warn");
+      } else {
+        leagueHtml += awardRow("Upset Watch", "No major upset detected this week (demo heuristic).", "—", "muted");
+      }
+      leagueBox.innerHTML = leagueHtml;
+
+      // Your lineup awards (from quotes; proxy for weekly)
+      const today = roster
+        .map(r=>({t:r.ticker, pos:r.pos, alloc:r.alloc, notes:r.notes||"", q: quotes[r.ticker]}))
+        .filter(x=>x.q && typeof x.q.dpc==="number");
+
+      const qb = roster.find(r=>r.pos==="QB")?.ticker || "—";
+      const mvp = today.slice().sort((a,b)=>b.q.dpc-a.q.dpc)[0];
+      const goat = today.slice().sort((a,b)=>a.q.dpc-b.q.dpc)[0];
+
+      let yourHtml = "";
+      if (mvp){
+        yourHtml += awardRow("MVP Stock", "Best performer in your roster (proxy: today %).", `${mvp.t} • ${fmtPct(mvp.q.dpc)}`, mvp.q.dpc>=0?"good":"bad");
+      } else {
+        yourHtml += awardRow("MVP Stock", "Waiting on price refresh…", "—", "muted");
+      }
+      if (goat){
+        yourHtml += awardRow("Pain of the Week", "Worst performer in your roster (proxy: today %).", `${goat.t} • ${fmtPct(goat.q.dpc)}`, goat.q.dpc>=0?"good":"bad");
+      } else {
+        yourHtml += awardRow("Pain of the Week", "Waiting on price refresh…", "—", "muted");
+      }
+      yourHtml += awardRow("QB Spotlight", "Your core anchor for the season.", qb, "warn");
+      const conc = calcQB();
+      yourHtml += awardRow("Concentration Check", "QB allocation (helps explain wins/losses).", `${conc.toFixed(1)}%`, conc>=35?"warn":"");
+      yourBox.innerHTML = yourHtml;
+
+      // Receipt
+      const lines = [];
+      lines.push(`🏆 Week ${wk} Awards`);
+      lines.push(`High Score: ${topTeam} (${topPts})`);
+      lines.push(`Low Score: ${lowTeam} (${lowPts})`);
+      lines.push(`Closest: ${closest.a} vs ${closest.b} (Δ${closestDiff})`);
+      lines.push(`Blowout: ${blowout.a} vs ${blowout.b} (Δ${blowoutDiff})`);
+      if (mvp) lines.push(`MVP Stock: ${mvp.t} (${fmtPct(mvp.q.dpc)})`);
+      if (goat) lines.push(`Pain: ${goat.t} (${fmtPct(goat.q.dpc)})`);
+      const receiptText = lines.join("\n");
+      receipt.innerHTML = '<div class="mono" style="white-space:pre-wrap; font-size:12px; color:rgba(233,237,247,.86);">'+escapeHtml(receiptText)+'</div>';
+      $("#btnCopyReceipt").onclick = async ()=>{
+        try{ await navigator.clipboard.writeText(receiptText); toast("Receipt copied."); }
+        catch{ toast("Copy failed."); }
+      };
+    }
+
+
+    function sendChat(text){
+      const t = (text ?? $("#chatInput")?.value ?? "").trim();
+      if (!t){ toast("Type a message."); return; }
+      const sender = $("#chatSender")?.value || "You (Playbook)";
+      chatMessages.push({ id: crypto.randomUUID?.() || String(Date.now()), sender, text: t, ts: Date.now() });
+      saveChat();
+      if ($("#chatInput")) $("#chatInput").value = "";
+      renderChat();
+    }
+
+    function clearChat(){
+      chatMessages = [];
+      saveChat();
+      renderChat();
+      toast("Chat cleared.");
+    }
+
+    function renderFreeAgents(){
+      const list = $("#faList");
+      if (!list) return;
+      list.innerHTML = "";
+      if (!freeAgents.length){
+        list.innerHTML = '<div class="small muted">No free agents yet. Add one above.</div>';
+        return;
+      }
+      // ensure unique + not on roster
+      freeAgents = Array.from(new Set(freeAgents)).filter(t=>!roster.some(r=>r.ticker===t));
+      saveFreeAgents();
+      for (const t of freeAgents){
+        const q = quotes[t] || null;
+        const price = (q && typeof q.c==="number") ? fmtUsd(q.c) : "—";
+        const chg = (q && typeof q.dpc==="number") ? fmtPct(q.dpc) : "—";
+        const chgCls = (q && typeof q.dpc==="number") ? (q.dpc>=0?"good":"bad") : "muted";
+        const row = document.createElement("div");
+        row.className = "faRow";
+        row.innerHTML = `
+          <div class="faLeft">
+            <span class="tickerchip" data-ticker="${escapeHtml(t)}" data-notes=""><span class="spark"></span>${escapeHtml(t)}</span>
+            <div class="faMeta">Price: <span class="mono">${price}</span> • <span class="mono ${chgCls}">${chg}</span></div>
+          </div>
+          <div class="faBtns">
+            <button class="btn" data-fa-add="${escapeHtml(t)}">Add to roster</button>
+            <button class="iconbtn" title="Remove" data-fa-drop="${escapeHtml(t)}">🗑</button>
+          </div>
+        `;
+        list.appendChild(row);
+      }
+      // wire buttons
+      list.querySelectorAll("button[data-fa-add]").forEach(b=>{
+        b.onclick = ()=> addToRosterFromFA(b.getAttribute("data-fa-add"));
+      });
+      list.querySelectorAll("button[data-fa-drop]").forEach(b=>{
+        b.onclick = ()=> dropFreeAgent(b.getAttribute("data-fa-drop"));
+      });
+      wireTickerChips(list);
+    }
+
+    function renderMatchup(){
+      const you = teamById("you");
+      const opp = teamById("opp");
+      $("#recYou").textContent = `${you.w}‑${you.l}`;
+      $("#recOpp").textContent = `${opp.w}‑${opp.l}`;
+
+      const game = league.schedule.find(g=>g.week===league.week && g.home==="you");
+      const wt = weightedToday();
+      const wk = (wt==null?0:wt);
+      const livePts = pointsFromWeeklyPct(wk) ?? 0;
+
+      const yourPts = (game && typeof game.homePts==="number") ? game.homePts : (wt==null ? "—" : livePts);
+      const oppPts  = (game && typeof game.awayPts==="number") ? game.awayPts : "—";
+
+      $("#wkYou").textContent = fmtPct(wk);
+      $("#scoreYou").textContent = yourPts;
+      $("#scoreOpp").textContent = oppPts;
+      $("#wkOpp").textContent = (game && typeof game.awayPct==="number") ? fmtPct(game.awayPct) : "—";
+      $("#qbYou").textContent = roster.find(r=>r.pos==="QB")?.ticker || "—";
+    }
+
+    function renderAll(){
+      renderKpis();
+      renderTable();
+      renderCharts();
+      renderStandings();
+      renderMatchup();
+      renderTeamPage();
+    }
+
+    // ===== MODAL =====
+    function openModal(){ $("#backdrop").style.display="flex"; $("#backdrop").setAttribute("aria-hidden","false"); }
+    function closeModal(){ $("#backdrop").style.display="none"; $("#backdrop").setAttribute("aria-hidden","true"); }
+
+    function openAdd(){
+      editIndex=null;
+      $("#modalTitle").textContent="Add ticker";
+      $("#mTicker").value="";
+      $("#mPos").value="QB";
+      $("#mAlloc").value="10";
+      $("#mNotes").value="";
+      openModal();
+      setTimeout(()=>$("#mTicker").focus(), 50);
+    }
+    function openEdit(idx){
+      const r=roster[idx]; if (!r) return;
+      editIndex=idx;
+      $("#modalTitle").textContent="Edit ticker";
+      $("#mTicker").value=r.ticker;
+      $("#mPos").value=r.pos;
+      $("#mAlloc").value=r.alloc;
+      $("#mNotes").value=r.notes||"";
+      openModal();
+    }
+    function delRow(idx){
+      const r=roster[idx]; if (!r) return;
+      roster.splice(idx,1);
+      toast("Removed "+r.ticker);
+      // add back to Free Agents watchlist
+      if (!freeAgents.includes(r.ticker)) freeAgents.unshift(r.ticker);
+      saveFreeAgents();
+      renderAll(); saveRoster();
+    }
+    function modalSave(){
+      const ticker = ($("#mTicker").value||"").trim().toUpperCase();
+      const pos = $("#mPos").value;
+      const alloc = parseFloat($("#mAlloc").value||"0");
+      const notes = ($("#mNotes").value||"").trim();
+      if (!ticker){ toast("Ticker required."); return; }
+      if (!pos){ toast("Position required."); return; }
+      if (!(alloc>=0)){ toast("Allocation must be >= 0."); return; }
+      const entry={ticker,pos,alloc,notes};
+      if (editIndex==null){ roster.push(entry); toast("Added "+ticker); }
+      else { roster[editIndex]=entry; toast("Updated "+ticker); }
+      closeModal(); renderAll(); saveRoster();
+    }
+
+    // ===== NAV =====
+    function setPage(page){
+      $$(".tab").forEach(t=>t.classList.toggle("active", t.dataset.page===page));
+      $("#page-playbook").style.display = (page==="playbook"?"":"none");
+      $("#page-matchup").style.display = (page==="matchup"?"":"none");
+      $("#page-draft").style.display = (page==="draft"?"":"none");
+      $("#page-standings").style.display = (page==="standings"?"":"none");
+      $("#page-awards").style.display = (page==="awards"?"":"none");
+      $("#page-team").style.display = (page==="team"?"":"none");
+      $("#page-chat").style.display = (page==="chat"?"":"none");
+      $("#page-concept").style.display = (page==="concept"?"":"none");
+      if (page==="draft") renderDraft();
+      if (page==="awards") renderAwards();
+      if (page==="chat") renderChat();
+    }
+
+    function attach(){
+      $$(".tab").forEach(tab=>tab.addEventListener("click",()=>setPage(tab.dataset.page)));
+
+      $("#btnAdd").addEventListener("click", openAdd);
+      $("#btnCancel").addEventListener("click", closeModal);
+      $("#btnModalSave").addEventListener("click", modalSave);
+      $("#backdrop").addEventListener("click",(e)=>{ if (e.target===$("#backdrop")) closeModal(); });
+
+      $("#pcClose").addEventListener("click", closePlayerCard);
+      $("#playerBackdrop").addEventListener("click",(e)=>{ if (e.target===$("#playerBackdrop")) closePlayerCard(); });
+
+      $("#btnNormalize").addEventListener("click", normalizeAlloc);
+      $("#btnSave").addEventListener("click", saveRoster);
+
+      $("#search").addEventListener("input", ()=>{ renderTable(); renderCharts(); });
+      $("#filterPos").addEventListener("change", ()=>{ renderTable(); renderCharts(); });
+      $("#sortBy").addEventListener("change", ()=>{ renderTable(); renderCharts(); });
+
+      $("#btnShare").addEventListener("click", ()=>{ const url=shareLink(); $("#shareUrl").value=url; });
+      $("#btnCopy").addEventListener("click", async ()=>{
+        const url=$("#shareUrl").value;
+        if (!url || url.includes("Click Share")){ toast("Generate a link first."); return; }
+        try{ await navigator.clipboard.writeText(url); toast("Copied."); }
+        catch{ toast("Copy failed — select & copy manually."); }
+      });
+      $("#btnLoadFromUrl").addEventListener("click", ()=>{ loadRoster(); renderAll(); });
+
+      $("#btnSimWeek").addEventListener("click", simulateWeek);
+      $("#btnResetLeague").addEventListener("click", resetLeague);
+
+      $("#btnFaAdd").addEventListener("click", ()=> addFreeAgent($("#faInput").value));
+
+      $("#btnChatSend").addEventListener("click", ()=> sendChat());
+      $("#chatInput").addEventListener("keydown",(e)=>{ if (e.key==="Enter") sendChat(); });
+      $("#btnChatClear").addEventListener("click", clearChat);
+      document.querySelectorAll(".qbtn[data-q]").forEach(b=> b.addEventListener("click", ()=> sendChat(b.getAttribute("data-q"))));
+
+      $("#btnAwardsRefresh").addEventListener("click", renderAwards);
+
+      // Draft Room
+      $("#btnDraftStart").addEventListener("click", startDraft);
+      $("#btnDraftPause").addEventListener("click", pauseDraft);
+      $("#btnDraftReset").addEventListener("click", resetDraft);
+      $("#btnDraftAuto").addEventListener("click", autoPick);
+      $("#btnDraftImport").addEventListener("click", importMyDraftToPlaybook);
+      $("#draftSearch").addEventListener("input", renderDraftPool);
+      $("#draftRounds").addEventListener("change", ()=>{ if (!draftState) renderDraft(); });
+      $("#draftClock").addEventListener("change", ()=>{ if (draftState){ draftState.clock = Math.max(5, Math.min(300, parseInt($("#draftClock").value||draftState.clock,10))); saveDraft(); renderDraftHeader(); } });
+
+      $("#faInput").addEventListener("keydown",(e)=>{ if (e.key==="Enter") addFreeAgent($("#faInput").value); });
+
+      $("#teamSelect").addEventListener("change", ()=> openTeam($("#teamSelect").value));
+      $("#btnBackToStandings").addEventListener("click", ()=> setPage("standings"));
+
+      $("#btnGoYourTeam").addEventListener("click", ()=> openTeam("you"));
+      $("#btnGoOppTeam").addEventListener("click", ()=> openTeam("opp"));
+
+      document.addEventListener("keydown",(e)=>{
+        if (e.key==="Escape") closeModal();
+        if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="s"){ e.preventDefault(); saveRoster(); }
+      });
+      window.addEventListener("resize", ()=> renderTable());
+    }
+
+    // INIT
+    loadRoster();
+    loadFreeAgents();
+    loadLeague();
+    loadChat();
+    loadDraft();
+    attach();
+    renderAll();
+    wireTickerChips();
+    refreshQuotes();
+    setInterval(refreshQuotes, 10000);
+    setInterval(renderHeaderStatus, 30000);
+  </script>
+</body>
+</html>
